@@ -38,6 +38,3 @@ out/
 
 ### 환경 설정 파일 무시 ###
 src/main/resources/application.yml
-
-
-

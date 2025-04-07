@@ -1,4 +1,4 @@
-package com.kkks.pofolling.editmentee.domain;
+package com.kkks.pofolling.editmentee.entity;
 
 public enum Status {
     NOT_STARTED,

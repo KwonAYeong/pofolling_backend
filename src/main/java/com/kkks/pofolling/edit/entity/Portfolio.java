@@ -1,4 +1,4 @@
-package com.kkks.pofolling.editmentee.entity;
+package com.kkks.pofolling.edit.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

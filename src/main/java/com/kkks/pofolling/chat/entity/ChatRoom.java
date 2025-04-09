@@ -21,15 +21,15 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;
 
-    @OneToOne
-    @JoinColumn(name = "portfolio_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mentor_id")
     private User mentor;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mentee_id")
     private User mentee;
 

@@ -1,4 +1,4 @@
-package com.kkks.pofolling.edit.entity;
+package com.kkks.pofolling.mypage.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +20,7 @@ public class Portfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "portfolio_id")
     private Long id;
 
     @Column(name = "user_id", nullable = false)
@@ -29,13 +30,13 @@ public class Portfolio {
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String text;
+    private String content;
 
     @Column(name = "file_url")
-    private String fileURL;
+    private String fileUrl;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private PortfolioStatus status;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -45,4 +46,3 @@ public class Portfolio {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
-

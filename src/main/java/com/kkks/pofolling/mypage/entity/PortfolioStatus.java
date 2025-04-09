@@ -1,8 +1,8 @@
 package com.kkks.pofolling.mypage.entity;
 
 public enum PortfolioStatus {
-    NOT_STARTED,
-    WAITING,
+    REGISTERED,
+    REQUESTED,
     IN_PROGRESS,
     COMPLETED
 }

@@ -1,5 +1,6 @@
-package com.kkks.pofolling.edit.entity;
+package com.kkks.pofolling.mypage.entity;
 
+import com.kkks.pofolling.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,22 +21,25 @@ public class Portfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "portfolio_id")
+    private Long portfolioId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String text;
+    private String content;
 
     @Column(name = "file_url")
-    private String fileURL;
+    private String fileUrl;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(nullable = false)
+    private PortfolioStatus status;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -45,4 +49,3 @@ public class Portfolio {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
-

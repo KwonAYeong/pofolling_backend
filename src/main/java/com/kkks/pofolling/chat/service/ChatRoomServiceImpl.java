@@ -29,13 +29,9 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     public ChatRoomResponseDTO createChatRoom(Long mentorId, Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new RuntimeException("포트폴리오 없음"));
-        if (portfolio.getUser() == null) {
-            throw new RuntimeException("포트폴리오-유저 연결 없음.");
-        }
 
-        // ✅ 상태가 REQUESTED일 때만 채팅 생성 가능
         if (portfolio.getStatus() != PortfolioStatus.REQUESTED) {
-            throw new IllegalStateException("채팅은 포트폴리오 상태가 REQUESTED일 때만 가능합니다.");
+            throw new RuntimeException("요청 상태인 포트폴리오만 첨삭을 시작할 수 있습니다.");
         }
 
         User mentor = userRepository.findById(mentorId)
@@ -55,6 +51,9 @@ public class ChatRoomServiceImpl implements ChatRoomService{
         }
 
         User mentee = portfolio.getUser();
+
+        portfolio.setStatus(PortfolioStatus.IN_PROGRESS);
+
         ChatRoom chatRoom = ChatRoom.builder()
                 .portfolio(portfolio)
                 .mentor(mentor)
@@ -72,7 +71,6 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                 .updatedAt(saved.getUpdatedAt())
                 .build();
     }
-
 
     @Override
     public List<ChatRoomResponseDTO> findAllChatRoomsByUserId(Long userId) {

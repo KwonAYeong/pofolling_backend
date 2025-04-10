@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+
     Optional<ChatRoom> findByPortfolio(Portfolio portfolio);
     List<ChatRoom> findByMentor_UserIdOrMentee_UserId(Long mentorId, Long menteeId);
 }

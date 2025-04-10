@@ -5,6 +5,8 @@ import com.kkks.pofolling.chat.entity.ChatMessage;
 import com.kkks.pofolling.chat.entity.ChatRoom;
 import com.kkks.pofolling.chat.repository.ChatMessageRepository;
 import com.kkks.pofolling.chat.repository.ChatRoomRepository;
+import com.kkks.pofolling.exception.BusinessException;
+import com.kkks.pofolling.exception.ExceptionCode;
 import com.kkks.pofolling.user.entity.User;
 import com.kkks.pofolling.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ChatMessageServiceImpl implements ChatMessageService{
+public class ChatMessageServiceImpl implements ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -25,10 +27,10 @@ public class ChatMessageServiceImpl implements ChatMessageService{
     @Transactional
     public ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new RuntimeException("chatRoom: " + chatRoomId + " 해당 채팅방 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.CHATROOM_NOT_FOUND));
 
         User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("senderId: " + senderId + " 해당 상대방 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 
         ChatMessage saved = chatMessageRepository.save(ChatMessage.builder()
                 .chatRoom(chatRoom)
@@ -59,5 +61,4 @@ public class ChatMessageServiceImpl implements ChatMessageService{
                         .build()
         ).toList();
     }
-
 }

@@ -2,8 +2,9 @@ package com.kkks.pofolling.chat.service;
 
 import com.kkks.pofolling.chat.dto.ChatRoomResponseDTO;
 import com.kkks.pofolling.chat.entity.ChatRoom;
-import com.kkks.pofolling.chat.repository.ChatMessageRepository;
 import com.kkks.pofolling.chat.repository.ChatRoomRepository;
+import com.kkks.pofolling.exception.BusinessException;
+import com.kkks.pofolling.exception.ExceptionCode;
 import com.kkks.pofolling.mypage.entity.Portfolio;
 import com.kkks.pofolling.mypage.entity.PortfolioStatus;
 import com.kkks.pofolling.mypage.repository.PortfolioRepository;
@@ -18,7 +19,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ChatRoomServiceImpl implements ChatRoomService{
+public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final PortfolioRepository portfolioRepository;
@@ -28,14 +29,18 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     @Transactional
     public ChatRoomResponseDTO createChatRoom(Long mentorId, Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new RuntimeException("portfolioId: "+ portfolioId + " 해당 포트폴리오 정보를 찾을 수 업습니다."));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
+
+        if (portfolio.getUser() == null) {
+            throw new BusinessException(ExceptionCode.USER_NOT_FOUND);
+        }
 
         if (portfolio.getStatus() != PortfolioStatus.REQUESTED) {
-            throw new RuntimeException("첨삭요청 상태인 포트폴리오만 첨삭을 시작할 수 있습니다.");
+            throw new BusinessException(ExceptionCode.INVALID_PORTFOLIO_STATUS);
         }
 
         User mentor = userRepository.findById(mentorId)
-                .orElseThrow(() -> new RuntimeException("mentorId: " + mentorId + " 해당 멘토 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.MENTOR_NOT_FOUND));
 
         Optional<ChatRoom> existingRoom = chatRoomRepository.findByPortfolio(portfolio);
         if (existingRoom.isPresent()) {
@@ -51,9 +56,6 @@ public class ChatRoomServiceImpl implements ChatRoomService{
         }
 
         User mentee = portfolio.getUser();
-
-        portfolio.setStatus(PortfolioStatus.IN_PROGRESS);
-
         ChatRoom chatRoom = ChatRoom.builder()
                 .portfolio(portfolio)
                 .mentor(mentor)
@@ -79,13 +81,13 @@ public class ChatRoomServiceImpl implements ChatRoomService{
         return rooms.stream()
                 .filter(room -> room.getPortfolio() != null)
                 .map(room -> ChatRoomResponseDTO.builder()
-                .chatRoomId(room.getChatRoomId())
-                .portfolioId(room.getPortfolio().getPortfolioId())
-                .mentorId(room.getMentor().getUserId())
-                .menteeId(room.getMentee().getUserId())
-                .createdAt(room.getCreatedAt())
-                .updatedAt(room.getUpdatedAt())
-                .build()
-        ).toList();
+                        .chatRoomId(room.getChatRoomId())
+                        .portfolioId(room.getPortfolio().getPortfolioId())
+                        .mentorId(room.getMentor().getUserId())
+                        .menteeId(room.getMentee().getUserId())
+                        .createdAt(room.getCreatedAt())
+                        .updatedAt(room.getUpdatedAt())
+                        .build()
+                ).toList();
     }
 }

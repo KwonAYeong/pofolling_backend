@@ -28,14 +28,14 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     @Transactional
     public ChatRoomResponseDTO createChatRoom(Long mentorId, Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new RuntimeException("포트폴리오 없음"));
+                .orElseThrow(() -> new RuntimeException("portfolioId: "+ portfolioId + " 해당 포트폴리오 정보를 찾을 수 업습니다."));
 
         if (portfolio.getStatus() != PortfolioStatus.REQUESTED) {
-            throw new RuntimeException("요청 상태인 포트폴리오만 첨삭을 시작할 수 있습니다.");
+            throw new RuntimeException("첨삭요청 상태인 포트폴리오만 첨삭을 시작할 수 있습니다.");
         }
 
         User mentor = userRepository.findById(mentorId)
-                .orElseThrow(() -> new RuntimeException("멘토 없음"));
+                .orElseThrow(() -> new RuntimeException("mentorId: " + mentorId + " 해당 멘토 정보를 찾을 수 없습니다."));
 
         Optional<ChatRoom> existingRoom = chatRoomRepository.findByPortfolio(portfolio);
         if (existingRoom.isPresent()) {

@@ -25,9 +25,10 @@ public class ChatMessageServiceImpl implements ChatMessageService{
     @Transactional
     public ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new RuntimeException("채팅방 없음"));
+                .orElseThrow(() -> new RuntimeException("chatRoom: " + chatRoomId + " 해당 채팅방 정보를 찾을 수 없습니다."));
+
         User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("보낸 사람 없음"));
+                .orElseThrow(() -> new RuntimeException("senderId: " + senderId + " 해당 상대방 정보를 찾을 수 없습니다."));
 
         ChatMessage saved = chatMessageRepository.save(ChatMessage.builder()
                 .chatRoom(chatRoom)

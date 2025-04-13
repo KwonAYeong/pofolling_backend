@@ -48,4 +48,10 @@ public class Portfolio {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    //==상태값 변경 메서드==//
+    public void updateStatus(PortfolioStatus status) {
+        this.status = status;
+    }
+
 }

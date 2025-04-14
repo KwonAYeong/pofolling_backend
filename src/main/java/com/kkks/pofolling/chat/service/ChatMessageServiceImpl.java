@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,12 +37,15 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .chatRoom(chatRoom)
                 .sender(sender)
                 .message(message)
+                .sentAt(LocalDateTime.now())
                 .build());
 
         return ChatMessageResponseDTO.builder()
                 .messageId(saved.getMessageId())
                 .chatRoomId(chatRoomId)
                 .senderId(senderId)
+                .senderNickname(sender.getNickname())
+                .senderProfileImage(sender.getProfileImage())
                 .message(saved.getMessage())
                 .sentAt(saved.getSentAt())
                 .build();
@@ -56,6 +60,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                         .messageId(msg.getMessageId())
                         .chatRoomId(msg.getChatRoom().getChatRoomId())
                         .senderId(msg.getSender().getUserId())
+                        .senderNickname(msg.getSender().getNickname())
+                        .senderProfileImage(msg.getSender().getProfileImage())
                         .message(msg.getMessage())
                         .sentAt(msg.getSentAt())
                         .build()

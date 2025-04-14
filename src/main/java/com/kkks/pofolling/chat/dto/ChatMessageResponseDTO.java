@@ -12,6 +12,8 @@ public class ChatMessageResponseDTO {
     private Long messageId;
     private Long chatRoomId;
     private Long senderId;
+    private String senderNickname;
+    private String senderProfileImage;
     private String message;
     private LocalDateTime sentAt;
 }

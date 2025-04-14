@@ -46,10 +46,12 @@ public class EditRequest {
     }
 
 
-    //==채팅방 생성시
-    public PortfolioStatus getStatus() {
-        return portfolio.getStatus();
+    //==멘토 검증 및 배정 메서드==//
+    public void assignMentor(User mentor) {
+        if (this.mentor != null) {
+            throw new IllegalStateException("이미 다른 멘토가 지정되어 있습니다.");
+        }
+        this.mentor = mentor;
     }
-
 
 }

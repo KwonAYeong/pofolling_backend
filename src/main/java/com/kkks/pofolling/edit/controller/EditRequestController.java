@@ -30,12 +30,9 @@ public class EditRequestController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<List<PortfolioResponseDTO>>> requestEdit(@RequestBody CreateEditRequestDTO dto) {
+    public ResponseEntity<ApiResponse<Void>> requestEdit(@RequestBody CreateEditRequestDTO dto) {
         editRequestService.requestEdit(dto.getPortfolioId(), dto.getMenteeId());
         return ResponseEntity.ok(ApiResponse.successWithMessage(204, "등록에 성공했습니다."));
     }
-
-
-
 
 }

@@ -24,7 +24,7 @@ public class EditRequest {
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "mentor_id")
     private User mentor;
 

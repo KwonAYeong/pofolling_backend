@@ -25,6 +25,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
 
+    // 채팅방 생성
     @Override
     @Transactional
     public ChatRoomResponseDTO createChatRoom(Long mentorId, Long portfolioId) {
@@ -45,14 +46,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Optional<ChatRoom> existingRoom = chatRoomRepository.findByPortfolio(portfolio);
         if (existingRoom.isPresent()) {
             ChatRoom room = existingRoom.get();
-            return ChatRoomResponseDTO.builder()
-                    .chatRoomId(room.getChatRoomId())
-                    .portfolioId(room.getPortfolio().getPortfolioId())
-                    .mentorId(room.getMentor().getUserId())
-                    .menteeId(room.getMentee().getUserId())
-                    .createdAt(room.getCreatedAt())
-                    .updatedAt(room.getUpdatedAt())
-                    .build();
+            return convertToDTO(room);
         }
 
         User mentee = portfolio.getUser();
@@ -63,31 +57,56 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
 
         ChatRoom saved = chatRoomRepository.save(chatRoom);
-
-        return ChatRoomResponseDTO.builder()
-                .chatRoomId(saved.getChatRoomId())
-                .portfolioId(saved.getPortfolio().getPortfolioId())
-                .mentorId(saved.getMentor().getUserId())
-                .menteeId(saved.getMentee().getUserId())
-                .createdAt(saved.getCreatedAt())
-                .updatedAt(saved.getUpdatedAt())
-                .build();
+        return convertToDTO(saved);
     }
 
+    // 첨삭 수락 시 사용되는 로직: 상태 조건 없이 채팅방만 생성
+    @Override
+    @Transactional
+    public ChatRoom createChatRoomIfNotExists(Long mentorId, Long menteeId, Long portfolioId) {
+        Optional<ChatRoom> existingRoom = chatRoomRepository
+                .findByMentor_UserIdAndMentee_UserIdAndPortfolio_PortfolioId(mentorId, menteeId, portfolioId);
+
+        if (existingRoom.isPresent()) {
+            return existingRoom.get();
+        }
+
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
+        User mentor = userRepository.findById(mentorId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
+        User mentee = userRepository.findById(menteeId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
+
+        ChatRoom newRoom = ChatRoom.builder()
+                .portfolio(portfolio)
+                .mentor(mentor)
+                .mentee(mentee)
+                .build();
+
+        return chatRoomRepository.save(newRoom);
+    }
+
+    // 채팅방 목록 조회
     @Override
     public List<ChatRoomResponseDTO> findAllChatRoomsByUserId(Long userId) {
         List<ChatRoom> rooms = chatRoomRepository.findByMentor_UserIdOrMentee_UserId(userId, userId);
 
         return rooms.stream()
                 .filter(room -> room.getPortfolio() != null)
-                .map(room -> ChatRoomResponseDTO.builder()
-                        .chatRoomId(room.getChatRoomId())
-                        .portfolioId(room.getPortfolio().getPortfolioId())
-                        .mentorId(room.getMentor().getUserId())
-                        .menteeId(room.getMentee().getUserId())
-                        .createdAt(room.getCreatedAt())
-                        .updatedAt(room.getUpdatedAt())
-                        .build()
-                ).toList();
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    // 공통 DTO 변환 로직
+    private ChatRoomResponseDTO convertToDTO(ChatRoom room) {
+        return ChatRoomResponseDTO.builder()
+                .chatRoomId(room.getChatRoomId())
+                .portfolioId(room.getPortfolio().getPortfolioId())
+                .mentorId(room.getMentor().getUserId())
+                .menteeId(room.getMentee().getUserId())
+                .createdAt(room.getCreatedAt())
+                .updatedAt(room.getUpdatedAt())
+                .build();
     }
 }

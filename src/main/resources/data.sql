@@ -1,39 +1,41 @@
 -- users
 INSERT INTO users (user_id, email, password, name, nickname, role, is_verified)
 VALUES
-(1, 'kay@example.com', '1234', 'KAY', 'kay', 'MENTEE', false),
-(2, 'khg@example.com', '1234', 'KHG', 'khg', 'MENTEE', false),
-(3, 'khm@example.com', '1234', 'KHM', 'khm', 'MENTOR', false),
-(4, 'sjy@example.com', '1234', 'SJY', 'sjy', 'MENTOR', false),
-(5, 'kds@example.com', '1234', 'KDJ', 'KDJ', 'MENTEE', false);
+    (1, 'kay@example.com', '1234', 'KAY', 'kay', 'MENTEE', false),
+    (2, 'khg@example.com', '1234', 'KHG', 'khg', 'MENTEE', false),
+    (3, 'khm@example.com', '1234', 'KHM', 'khm', 'MENTOR', false),
+    (4, 'sjy@example.com', '1234', 'SJY', 'sjy', 'MENTOR', false),
+    (5, 'kds@example.com', '1234', 'KDJ', 'KDJ', 'MENTEE', false);
 
 -- portfolio
 INSERT INTO portfolio (portfolio_id, user_id, title, content, file_url, status, created_at, updated_at)
 VALUES
-(1, 1, '포트폴리오 제목1', '포트폴리오 내용1', null, 'REQUESTED', now(), now()),
-(2, 1, '포트폴리오 제목2', '포트폴리오 내용2', null, 'REQUESTED', now(), now()),
-(3, 2, '포트폴리오 제목3', '포트폴리오 내용3', null, 'REGISTERED', now(), now()),
-(4, 2, '포트폴리오 제목4', '포트폴리오 내용4', null, 'REGISTERED', now(), now()),
-(5, 3, '포트폴리오 제목5', '포트폴리오 내용5', null, 'IN_PROGRESS', now(), now()),
-(6, 3, '포트폴리오 제목6', '포트폴리오 내용6', null, 'COMPLETED', now(), now()),
-(7, 4, '포트폴리오 제목7', '포트폴리오 내용7', null, 'REQUESTED', now(), now()),
-(8, 4, '포트폴리오 제목8', '포트폴리오 내용8', null, 'REGISTERED', now(), now()),
-(9, 5, '포트폴리오 제목9', '포트폴리오 내용9', null, 'IN_PROGRESS', now(), now()),
-(10, 5, '포트폴리오 제목10', '포트폴리오 내용10', null, 'COMPLETED', now(), now());
+    (1, 1, '포트폴리오 제목1', '포트폴리오 내용1', null, 'REQUESTED', now(), now()),
+    (2, 1, '포트폴리오 제목2', '포트폴리오 내용2', null, 'IN_PROGRESS', now(), now()),
+    (3, 2, '포트폴리오 제목3', '포트폴리오 내용3', null, 'REQUESTED', now(), now()),
+    (4, 2, '포트폴리오 제목4', '포트폴리오 내용4', null, 'REQUESTED', now(), now()),
+    (5, 3, '포트폴리오 제목5', '포트폴리오 내용5', null, 'REGISTERED', now(), now()),
+    (6, 3, '포트폴리오 제목6', '포트폴리오 내용6', null, 'REGISTERED', now(), now()),
+    (7, 4, '포트폴리오 제목7', '포트폴리오 내용7', null, 'IN_PROGRESS', now(), now()),
+    (8, 4, '포트폴리오 제목8', '포트폴리오 내용8', null, 'REGISTERED', now(), now()),
+    (9, 5, '포트폴리오 제목9', '포트폴리오 내용9', null, 'IN_PROGRESS', now(), now()),
+    (10, 5, '포트폴리오 제목10', '포트폴리오 내용10', null, 'COMPLETED', now(), now());
 
 -- edit_request
 INSERT INTO edit_request (edit_request_id, mentee_id, mentor_id, portfolio_id, requested_at)
 VALUES
-(1, 1, null,1, now()),
-(2, 1, null,2, now()),
-(3, 4, 3, 7, now());
+    (1, 1, null,1, now()),
+    (2, 1, 3, 2, now()),
+    (3, 5, 3, 9, now()),
+    (4, 2, null, 3, now()),
+    (5, 2, null, 4, now());
 
 -- chat_room
 INSERT INTO chat_room (chat_room_id, portfolio_id, mentor_id, mentee_id, created_at, updated_at)
 VALUES
-(1, 1, 3, 1, NOW(), NOW()),
-(2, 3, 4, 2, NOW(), NOW()),
-(3, 2, 4, 1, NOW(), NOW());
+    (1, 1, 3, 1, NOW(), NOW()),
+    (2, 3, 4, 2, NOW(), NOW()),
+    (3, 2, 4, 1, NOW(), NOW());
 
 -- chat_message
 INSERT INTO chat_message (message_id, chat_room_id, sender_id, message, sent_at)

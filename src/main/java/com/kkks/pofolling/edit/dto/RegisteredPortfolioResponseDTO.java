@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class PortfolioResponseDTO {
+public class RegisteredPortfolioResponseDTO {
     private Long portfolioId;
     private String title;
     private LocalDateTime updatedAt;
 
-    public static PortfolioResponseDTO from(Portfolio portfolio) {
-        return new PortfolioResponseDTO(
+    public static RegisteredPortfolioResponseDTO from(Portfolio portfolio) {
+        return new RegisteredPortfolioResponseDTO(
                 portfolio.getPortfolioId(),
                 portfolio.getTitle(),
                 portfolio.getUpdatedAt()

@@ -1,6 +1,6 @@
 package com.kkks.pofolling.edit.service;
 
-import com.kkks.pofolling.edit.dto.PortfolioResponseDTO;
+import com.kkks.pofolling.edit.dto.RegisteredPortfolioResponseDTO;
 import com.kkks.pofolling.edit.entity.EditRequest;
 import com.kkks.pofolling.edit.repository.EditRequestRepository;
 import com.kkks.pofolling.mypage.entity.Portfolio;
@@ -30,7 +30,7 @@ public class EditRequestServiceImpl implements EditRequestService{
 
     @Override
     @Transactional(readOnly = true)
-    public List<PortfolioResponseDTO> getRegisteredPf(Long userId) {
+    public List<RegisteredPortfolioResponseDTO> getRegisteredPf(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         List<Portfolio> portfolios = portfolioRepository.findByUserAndStatus(user, REGISTERED);
@@ -53,9 +53,9 @@ public class EditRequestServiceImpl implements EditRequestService{
         editRequestRepository.save(editRequest); //editRequest 저장
     }
 
-    private List<PortfolioResponseDTO> getDtoList(List<Portfolio> portfolios) {
+    private List<RegisteredPortfolioResponseDTO> getDtoList(List<Portfolio> portfolios) {
         return portfolios.stream()
-                .map(PortfolioResponseDTO::from)
+                .map(RegisteredPortfolioResponseDTO::from)
                 .toList();
     }
 

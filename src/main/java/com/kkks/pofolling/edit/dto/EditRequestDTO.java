@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-public class CreateEditRequestDTO {
+public class EditRequestDTO {
     private Long portfolioId;
     private Long menteeId;
 }

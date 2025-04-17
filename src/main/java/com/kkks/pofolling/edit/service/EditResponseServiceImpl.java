@@ -1,12 +1,10 @@
 package com.kkks.pofolling.edit.service;
 
 import com.kkks.pofolling.chat.service.ChatRoomService;
-import com.kkks.pofolling.edit.dto.RequestEditDetailResponseDTO;
-import com.kkks.pofolling.edit.dto.RequestEditsResponseDTO;
+import com.kkks.pofolling.edit.dto.EditDetailResponseDTO;
+import com.kkks.pofolling.edit.dto.EditListResponseDTO;
 import com.kkks.pofolling.edit.entity.EditRequest;
 import com.kkks.pofolling.edit.repository.EditRequestRepository;
-import com.kkks.pofolling.mypage.entity.Portfolio;
-import com.kkks.pofolling.mypage.entity.PortfolioStatus;
 import com.kkks.pofolling.user.entity.User;
 import com.kkks.pofolling.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.kkks.pofolling.mypage.entity.PortfolioStatus.*;
 
@@ -39,19 +35,19 @@ public class EditResponseServiceImpl implements EditResponseService{
     // 요청된 첨삭들 가져오기
     @Override
     @Transactional(readOnly = true)
-    public Page<RequestEditsResponseDTO> getRequestEditList(Pageable pageable) {
+    public Page<EditListResponseDTO> getRequestEditList(Pageable pageable) {
         return editRequestRepository.findByPortfolio_Status(REQUESTED, pageable)
-                .map(RequestEditsResponseDTO::from);
+                .map(EditListResponseDTO::from);
     }
 
     // 요청된 첨삭 세부정보 가져오기
     @Override
     @Transactional(readOnly = true)
-    public RequestEditDetailResponseDTO getRequestEditDetail(Long editRequestId) {
+    public EditDetailResponseDTO getRequestEditDetail(Long editRequestId) {
         EditRequest findEditRequest = editRequestRepository.findById(editRequestId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 요청첨삭입니다."));
 
-        return RequestEditDetailResponseDTO.from(findEditRequest);
+        return EditDetailResponseDTO.from(findEditRequest);
     }
 
     // 채팅방 생성 + 첨삭 시작

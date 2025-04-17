@@ -1,7 +1,7 @@
 package com.kkks.pofolling.edit.controller;
 
-import com.kkks.pofolling.edit.dto.CreateEditRequestDTO;
-import com.kkks.pofolling.edit.dto.PortfolioResponseDTO;
+import com.kkks.pofolling.edit.dto.EditRequestDTO;
+import com.kkks.pofolling.edit.dto.RegisteredPortfolioResponseDTO;
 import com.kkks.pofolling.edit.service.EditRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +20,8 @@ public class EditRequestController {
     }
 
     @GetMapping("/{userId}") // 유저의 등록된 포트폴리오를 가져오는 컨트롤러
-    public ResponseEntity<ApiResponse<List<PortfolioResponseDTO>>> getEditRequestList(@PathVariable Long userId) {
-        List<PortfolioResponseDTO> result = editRequestService.getRegisteredPf(userId);
+    public ResponseEntity<ApiResponse<List<RegisteredPortfolioResponseDTO>>> getEditRequestList(@PathVariable Long userId) {
+        List<RegisteredPortfolioResponseDTO> result = editRequestService.getRegisteredPf(userId);
 
         if (result.isEmpty() ) {
             return ResponseEntity.ok(ApiResponse.successWithMessage(200, "등록된 포트폴리오가 없습니다."));
@@ -30,7 +30,7 @@ public class EditRequestController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> requestEdit(@RequestBody CreateEditRequestDTO dto) {
+    public ResponseEntity<ApiResponse<Void>> requestEdit(@RequestBody EditRequestDTO dto) {
         editRequestService.requestEdit(dto.getPortfolioId(), dto.getMenteeId());
         return ResponseEntity.ok(ApiResponse.successWithMessage(204, "등록에 성공했습니다."));
     }

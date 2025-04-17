@@ -1,6 +1,6 @@
 package com.kkks.pofolling.edit.service;
 
-import com.kkks.pofolling.edit.dto.RequestEditDetailResponseDTO;
+import com.kkks.pofolling.edit.dto.EditDetailResponseDTO;
 import com.kkks.pofolling.edit.entity.EditRequest;
 import com.kkks.pofolling.edit.repository.EditRequestRepository;
 import com.kkks.pofolling.mypage.entity.Portfolio;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -42,7 +41,7 @@ class EditResponseServiceImplTest {
         EditRequest er = editRequestRepository.save(editRequest);
 
         //when
-        RequestEditDetailResponseDTO requestEditDetail = editResponseService.getRequestEditDetail(er.getEditRequestId());
+        EditDetailResponseDTO requestEditDetail = editResponseService.getRequestEditDetail(er.getEditRequestId());
 
         //then
         assertThat(requestEditDetail.getPortfolioId()).isEqualTo(pf.getPortfolioId());

@@ -10,27 +10,33 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class RequestEditsResponseDTO {
-    private Long editRequestId;
+public class EditDetailResponseDTO {
+    // 포트폴리오 정보
+    private Long portfolioId;
     private String title;
+    private String content;
+    private String fileUrl;
+    private LocalDateTime updatedAt;
+
+    // 멘티 정보
+    private Long menteeId;
     private String profileImage;
     private String nickname;
-    private LocalDateTime requestedAt;
-    private String job_id;
 
     //==DTO 생성 메서드==//
-    public static RequestEditsResponseDTO from(EditRequest editRequest) {
+    public static EditDetailResponseDTO from(EditRequest editRequest) {
         User mentee = editRequest.getMentee();
         Portfolio portfolio = editRequest.getPortfolio();
-        return new RequestEditsResponseDTO(
-                editRequest.getEditRequestId(),
+
+        return new EditDetailResponseDTO(
+                portfolio.getPortfolioId(),
                 portfolio.getTitle(),
+                portfolio.getContent(),
+                portfolio.getFileUrl(),
+                portfolio.getUpdatedAt(),
+                mentee.getUserId(),
                 mentee.getProfileImage(),
-                mentee.getNickname(),
-                editRequest.getRequestedAt(),
-                mentee.getJobId()
+                mentee.getNickname()
         );
     }
 }
-
-

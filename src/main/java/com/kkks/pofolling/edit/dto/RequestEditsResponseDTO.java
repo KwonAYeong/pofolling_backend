@@ -15,9 +15,8 @@ public class RequestEditsResponseDTO {
     private String title;
     private String profileImage;
     private String nickname;
-    private String name;
     private LocalDateTime requestedAt;
-    private String career;
+    private String job_id;
 
     //==DTO 생성 메서드==//
     public static RequestEditsResponseDTO from(EditRequest editRequest) {
@@ -28,9 +27,8 @@ public class RequestEditsResponseDTO {
                 portfolio.getTitle(),
                 mentee.getProfileImage(),
                 mentee.getNickname(),
-                mentee.getName(),
                 editRequest.getRequestedAt(),
-                mentee.getCareer()
+                mentee.getJobId()
         );
     }
 }

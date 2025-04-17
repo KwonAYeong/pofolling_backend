@@ -22,7 +22,6 @@ public class RequestEditDetailResponseDTO {
     private Long menteeId;
     private String profileImage;
     private String nickname;
-    private String name;
 
     //==DTO 생성 메서드==//
     public static RequestEditDetailResponseDTO from(EditRequest editRequest) {
@@ -37,8 +36,7 @@ public class RequestEditDetailResponseDTO {
                 portfolio.getUpdatedAt(),
                 mentee.getUserId(),
                 mentee.getProfileImage(),
-                mentee.getNickname(),
-                mentee.getName()
+                mentee.getNickname()
         );
     }
 }

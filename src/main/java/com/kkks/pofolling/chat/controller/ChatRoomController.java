@@ -15,6 +15,7 @@ public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
 
+    // 채팅방 생성
     @PostMapping
     public ResponseEntity<?> createChatRoom(@RequestBody ChatRoomRequestDTO requestDTO) {
         return ResponseEntity.ok(
@@ -22,6 +23,7 @@ public class ChatRoomController {
         );
     }
 
+    // 채팅방 목록 조회
     @GetMapping("/list/{userId}")
     public ResponseEntity<?> findChatRooms(@PathVariable Long userId) {
         return ResponseEntity.ok(chatRoomService.findAllChatRoomsByUserId(userId));

@@ -14,6 +14,8 @@ public enum ExceptionCode {
 
     // chat
     CHATROOM_NOT_FOUND(404, "CHATROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),
+    CHATROOM_CLOSED(403, "CHATROOM_CLOSED", "첨삭이 종료된 채팅방입니다."),
+
 
     // system_error
     UNKNOWN_ERROR(500, "UNKNOWN_ERROR", "예상치 못한 서버 에러가 발생했습니다.");

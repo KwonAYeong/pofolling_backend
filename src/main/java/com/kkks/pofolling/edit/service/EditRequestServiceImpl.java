@@ -3,6 +3,8 @@ package com.kkks.pofolling.edit.service;
 import com.kkks.pofolling.edit.dto.RegisteredPortfolioResponseDTO;
 import com.kkks.pofolling.edit.entity.EditRequest;
 import com.kkks.pofolling.edit.repository.EditRequestRepository;
+import com.kkks.pofolling.exception.BusinessException;
+import com.kkks.pofolling.exception.ExceptionCode;
 import com.kkks.pofolling.mypage.entity.Portfolio;
 import com.kkks.pofolling.mypage.repository.PortfolioRepository;
 import com.kkks.pofolling.user.entity.User;
@@ -32,7 +34,7 @@ public class EditRequestServiceImpl implements EditRequestService{
     @Transactional(readOnly = true)
     public List<RegisteredPortfolioResponseDTO> getRegisteredPf(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
         List<Portfolio> portfolios = portfolioRepository.findByUserAndStatus(user, REGISTERED);
 
         return getDtoList(portfolios);
@@ -43,9 +45,17 @@ public class EditRequestServiceImpl implements EditRequestService{
     public void requestEdit(Long portfolioId, Long menteeId) {
         //포트폴리오id와 유저id로 객체 가져오기
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 포트폴리오입니다."));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
         User mentee = userRepository.findById(menteeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멘티가 없습니다."));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
+        //포트폴리오 소유자 인지 검증
+        if (!portfolio.getUser().getUserId().equals(menteeId)) {
+            throw new BusinessException(ExceptionCode.UNAUTHORIZED_EDIT_REQUEST);
+        }
+        //등록된 포트폴리오가 아닐 시 예외 처리
+        if (!portfolio.getStatus().equals(REGISTERED)) {
+            throw new BusinessException(ExceptionCode.INVALID_EDIT_STATE);
+        }
 
         portfolio.updateStatus(REQUESTED); //포트폴리오 상태값 REQUESTED로 변경
 
@@ -58,6 +68,5 @@ public class EditRequestServiceImpl implements EditRequestService{
                 .map(RegisteredPortfolioResponseDTO::from)
                 .toList();
     }
-
 
 }

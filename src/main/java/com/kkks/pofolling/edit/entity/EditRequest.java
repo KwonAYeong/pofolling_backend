@@ -1,5 +1,7 @@
 package com.kkks.pofolling.edit.entity;
 
+import com.kkks.pofolling.exception.BusinessException;
+import com.kkks.pofolling.exception.ExceptionCode;
 import com.kkks.pofolling.mypage.entity.Portfolio;
 import com.kkks.pofolling.mypage.entity.PortfolioStatus;
 import com.kkks.pofolling.user.entity.User;
@@ -7,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
@@ -48,8 +52,15 @@ public class EditRequest {
 
     //==멘토 검증 및 배정 메서드==//
     public void assignMentor(User mentor) {
+        //멘토 검증 로직
+        Boolean isVerified = mentor.getIsVerified();
+        if (!isVerified) {
+            throw new BusinessException(ExceptionCode.NOT_VERIFIED_MENTOR);
+        }
+
+        //멘토 유무
         if (this.mentor != null) {
-            throw new IllegalStateException("이미 다른 멘토가 지정되어 있습니다.");
+            throw new BusinessException(ExceptionCode.ALREADY_ASSIGNED_MENTOR);
         }
         this.mentor = mentor;
     }

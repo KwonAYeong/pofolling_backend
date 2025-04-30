@@ -84,6 +84,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .portfolio(portfolio)
                 .mentor(mentor)
                 .mentee(mentee)
+                .isActive(true)
                 .build();
 
         return chatRoomRepository.save(newRoom);
@@ -131,8 +132,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .orElseThrow(() -> new BusinessException(ExceptionCode.CHATROOM_NOT_FOUND));
 
         chatRoom.deactivate();
-    }
 
+        Portfolio portfolio = chatRoom.getPortfolio();
+        portfolio.updateStatus(PortfolioStatus.COMPLETED);
+    }
 
     // 공통 DTO 변환
     private ChatRoomResponseDTO convertToDTO(ChatRoom room) {

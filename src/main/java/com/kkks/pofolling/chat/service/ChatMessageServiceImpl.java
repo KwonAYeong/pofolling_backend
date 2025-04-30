@@ -25,8 +25,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final UserRepository userRepository;
 
     // 채팅 메세지 저장
-    // 📁 ChatMessageServiceImpl.java
-
     @Override
     @Transactional
     public ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message) {
@@ -57,7 +55,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .sentAt(saved.getSentAt())
                 .build();
     }
-
 
     // 채팅방의 모든 메세지 조회
     @Override

@@ -24,11 +24,16 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
 
+    // 채팅 메세지 저장
     @Override
     @Transactional
     public ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.CHATROOM_NOT_FOUND));
+
+        if (!chatRoom.isActive()) {
+            throw new BusinessException(ExceptionCode.CHATROOM_CLOSED);  // 커스텀 예외 코드 추가 필요
+        }
 
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
@@ -51,6 +56,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .build();
     }
 
+    // 채팅방의 모든 메세지 조회
     @Override
     public List<ChatMessageResponseDTO> findAllMessagesByChatRoomId(Long chatRoomId) {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoom_ChatRoomIdOrderBySentAt(chatRoomId);

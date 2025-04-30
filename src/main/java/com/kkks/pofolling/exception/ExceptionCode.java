@@ -14,6 +14,8 @@ public enum ExceptionCode {
 
     // chat
     CHATROOM_NOT_FOUND(404, "CHATROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),
+    CHATROOM_CLOSED(403, "CHATROOM_CLOSED", "첨삭이 종료된 채팅방입니다."),
+
 
     // edit
     INVALID_EDIT_STATE(400,"INVALID_EDIT_STATE","등록 상태인 프트폴리오만 첨삭을 요청할 수 있습니다."),

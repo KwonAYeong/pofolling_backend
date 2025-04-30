@@ -1,7 +1,9 @@
 package com.kkks.pofolling.chat.service;
 
 import com.kkks.pofolling.chat.dto.ChatRoomResponseDTO;
+import com.kkks.pofolling.chat.entity.ChatMessage;
 import com.kkks.pofolling.chat.entity.ChatRoom;
+import com.kkks.pofolling.chat.repository.ChatMessageRepository;
 import com.kkks.pofolling.chat.repository.ChatRoomRepository;
 import com.kkks.pofolling.exception.BusinessException;
 import com.kkks.pofolling.exception.ExceptionCode;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +27,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
-    // 채팅방 생성
+    // 채팅방 생성 요청
     @Override
     @Transactional
     public ChatRoomResponseDTO createChatRoom(Long mentorId, Long portfolioId) {
@@ -45,22 +49,20 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         Optional<ChatRoom> existingRoom = chatRoomRepository.findByPortfolio(portfolio);
         if (existingRoom.isPresent()) {
-            ChatRoom room = existingRoom.get();
-            return convertToDTO(room);
+            return convertToDTO(existingRoom.get());
         }
 
-        User mentee = portfolio.getUser();
         ChatRoom chatRoom = ChatRoom.builder()
                 .portfolio(portfolio)
                 .mentor(mentor)
-                .mentee(mentee)
+                .mentee(portfolio.getUser())
                 .build();
 
         ChatRoom saved = chatRoomRepository.save(chatRoom);
         return convertToDTO(saved);
     }
 
-    // 첨삭 수락 시 사용되는 로직: 상태 조건 없이 채팅방만 생성
+    // 채팅방 생성
     @Override
     @Transactional
     public ChatRoom createChatRoomIfNotExists(Long mentorId, Long menteeId, Long portfolioId) {
@@ -82,6 +84,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .portfolio(portfolio)
                 .mentor(mentor)
                 .mentee(mentee)
+                .isActive(true)
                 .build();
 
         return chatRoomRepository.save(newRoom);
@@ -94,11 +97,47 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         return rooms.stream()
                 .filter(room -> room.getPortfolio() != null)
-                .map(this::convertToDTO)
+                .map(room -> {
+                    ChatMessage lastMessage = chatMessageRepository.findByChatRoom_ChatRoomIdOrderBySentAt(room.getChatRoomId())
+                            .stream()
+                            .max(Comparator.comparing(ChatMessage::getSentAt))
+                            .orElse(null);
+
+                    String lastMessageContent = (lastMessage != null) ? "새 메세지가 있습니다" : "";
+
+                    // 상대방 정보 세팅
+                    User opponent = room.getMentor().getUserId().equals(userId) ? room.getMentee() : room.getMentor();
+
+                    return ChatRoomResponseDTO.builder()
+                            .chatRoomId(room.getChatRoomId())
+                            .portfolioId(room.getPortfolio().getPortfolioId())
+                            .mentorId(room.getMentor().getUserId())
+                            .menteeId(room.getMentee().getUserId())
+                            .senderId(opponent.getUserId())
+                            .senderNickname(opponent.getNickname())
+                            .senderProfileImage(opponent.getProfileImage())
+                            .lastMessage(lastMessageContent)
+                            .isActive(room.isActive())
+                            .createdAt(room.getCreatedAt())
+                            .updatedAt(room.getUpdatedAt())
+                            .build();
+                })
                 .toList();
     }
 
-    // 공통 DTO 변환 로직
+    // 채팅방 종료
+    @Transactional
+    public void deactivateChatRoom(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.CHATROOM_NOT_FOUND));
+
+        chatRoom.deactivate();
+
+        Portfolio portfolio = chatRoom.getPortfolio();
+        portfolio.updateStatus(PortfolioStatus.COMPLETED);
+    }
+
+    // 공통 DTO 변환
     private ChatRoomResponseDTO convertToDTO(ChatRoom room) {
         return ChatRoomResponseDTO.builder()
                 .chatRoomId(room.getChatRoomId())

@@ -16,6 +16,7 @@ public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
 
+    // 채팅 메세지 전송
     @PostMapping("/messages")
     public ResponseEntity<ChatMessageResponseDTO> sendMessage(
             @PathVariable Long chatRoomId,
@@ -29,6 +30,7 @@ public class ChatMessageController {
         return ResponseEntity.ok(response);
     }
 
+    // 채팅방의 모든 메세지 조회
     @GetMapping("/messages")
     public ResponseEntity<?> getMessages(@PathVariable Long chatRoomId) {
         return ResponseEntity.ok(chatMessageService.findAllMessagesByChatRoomId(chatRoomId));

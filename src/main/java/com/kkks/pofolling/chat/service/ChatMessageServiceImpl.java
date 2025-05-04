@@ -32,7 +32,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .orElseThrow(() -> new BusinessException(ExceptionCode.CHATROOM_NOT_FOUND));
 
         if (!chatRoom.isActive()) {
-            throw new BusinessException(ExceptionCode.CHATROOM_CLOSED);  // 커스텀 예외 코드 추가 필요
+            throw new BusinessException(ExceptionCode.CHATROOM_CLOSED);
         }
 
         User sender = userRepository.findById(senderId)
@@ -58,6 +58,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     // 채팅방의 모든 메세지 조회
     @Override
+    @Transactional(readOnly = true)
     public List<ChatMessageResponseDTO> findAllMessagesByChatRoomId(Long chatRoomId) {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoom_ChatRoomIdOrderBySentAt(chatRoomId);
 

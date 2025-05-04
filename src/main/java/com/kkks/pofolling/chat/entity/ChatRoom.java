@@ -44,6 +44,10 @@ public class ChatRoom {
     @Column(name = "is_active")
     private boolean isActive = true;
 
+    public void activate() {
+        this.isActive = true;
+    }
+
     public void deactivate() {
         this.isActive = false;
     }

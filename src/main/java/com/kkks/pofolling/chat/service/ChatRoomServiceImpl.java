@@ -70,9 +70,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .findByMentor_UserIdAndMentee_UserIdAndPortfolio_PortfolioId(mentorId, menteeId, portfolioId);
 
         if (existingRoom.isPresent()) {
-            return existingRoom.get();
+            ChatRoom room = existingRoom.get();
+
+            // 비활성화 상태면 다시 활성화
+            if (!room.isActive()) {
+                room.activate(); // 또는 room.setIsActive(true);
+            }
+
+            return room;
         }
 
+        // 기존 방 없음 → 새로 생성
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
         User mentor = userRepository.findById(mentorId)
@@ -89,6 +97,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         return chatRoomRepository.save(newRoom);
     }
+
 
     // 채팅방 목록 조회
     @Override

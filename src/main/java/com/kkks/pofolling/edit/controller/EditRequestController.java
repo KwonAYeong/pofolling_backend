@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/edit-requests")
+@RequestMapping("/edit-request")
 public class EditRequestController {
     private final EditRequestService editRequestService;
 

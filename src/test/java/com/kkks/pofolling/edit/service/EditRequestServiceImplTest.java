@@ -1,5 +1,6 @@
 package com.kkks.pofolling.edit.service;
 
+import com.kkks.pofolling.edit.entity.EditRequest;
 import com.kkks.pofolling.mypage.entity.Portfolio;
 import com.kkks.pofolling.mypage.entity.PortfolioStatus;
 import com.kkks.pofolling.mypage.repository.PortfolioRepository;
@@ -47,6 +48,9 @@ class EditRequestServiceImplTest {
         assertThat(result.get().getStatus()).isEqualTo(PortfolioStatus.REQUESTED);
     }
 
+
+
+
     //==테스트용 유저 생성 메서드==//
     private User createTestUser() {
         return User.builder()
@@ -56,6 +60,25 @@ class EditRequestServiceImplTest {
                 .nickname("tester")
                 .role(UserRole.MENTEE)
                 .isVerified(false)
+                .build();
+    }
+
+    //==테스트용 요청첨삭 생성 메서드==//
+    private EditRequest createTestER(Portfolio pf, User mentee, User mentor) {
+        return EditRequest.builder()
+                .portfolio(pf)
+                .mentee(mentee)
+                .mentor(mentor)
+                .build();
+    }
+
+    //==테스트용 포폴 생성 메서드==//
+    private Portfolio createTestPf(User user) {
+        return Portfolio.builder()
+                .title("포폴 테스트")
+                .content("테스트입니다.")
+                .user(user)
+                .status(PortfolioStatus.REQUESTED)
                 .build();
     }
 

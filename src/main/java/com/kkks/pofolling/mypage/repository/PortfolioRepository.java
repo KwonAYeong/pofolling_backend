@@ -1,5 +1,6 @@
 package com.kkks.pofolling.mypage.repository;
 
+import com.kkks.pofolling.chat.entity.ChatRoom;
 import com.kkks.pofolling.mypage.entity.Portfolio;
 import com.kkks.pofolling.mypage.entity.PortfolioStatus;
 import com.kkks.pofolling.user.entity.User;
@@ -11,6 +12,8 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
     // User정보와 포트폴리오상태로 조회된 포트폴리오들 가져오기.
     List<Portfolio> findByUserAndStatusIn(User user, List<PortfolioStatus> statuses);
+    List<Portfolio> findAllByChatRoom(ChatRoom chatRoom);
+
 
 
 }

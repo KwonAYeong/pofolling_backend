@@ -38,6 +38,4 @@ public class ChatRoomController {
         return ResponseEntity.ok("첨삭종료");
     }
 
-
-
 }

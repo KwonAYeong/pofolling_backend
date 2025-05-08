@@ -8,7 +8,7 @@ import java.util.List;
 public interface ChatRoomService {
 
     ChatRoomResponseDTO createChatRoom(Long mentorId, Long portfolioId);
-    ChatRoom createChatRoomIfNotExists(Long mentorId, Long menteeId, Long portfolioId);
+    ChatRoom createChatRoomIfNotExists(Long mentorId, Long menteeId);
     List<ChatRoomResponseDTO> findAllChatRoomsByUserId(Long userId);
     void deactivateChatRoom(Long chatRoomId);
 }

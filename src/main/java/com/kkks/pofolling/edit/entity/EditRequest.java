@@ -24,7 +24,7 @@ public class EditRequest {
     @Column(name = "edit_request_id")
     private Long editRequestId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 

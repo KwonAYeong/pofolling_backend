@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,34 +106,41 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<ChatRoom> rooms = chatRoomRepository.findByMentor_UserIdOrMentee_UserId(userId, userId);
 
         return rooms.stream()
-                .filter(room -> room.getPortfolio() != null)
                 .map(room -> {
-                    ChatMessage lastMessage = chatMessageRepository.findByChatRoom_ChatRoomIdOrderBySentAt(room.getChatRoomId())
-                            .stream()
-                            .max(Comparator.comparing(ChatMessage::getSentAt))
-                            .orElse(null);
+                    // ① 마지막 메시지 하나만 조회
+                    Optional<ChatMessage> lastMessageOpt = chatMessageRepository
+                            .findTopByChatRoom_ChatRoomIdOrderBySentAtDesc(room.getChatRoomId());
 
-                    String lastMessageContent = (lastMessage != null) ? "새 메세지가 있습니다" : "";
+                    String lastMessageContent = lastMessageOpt.map(ChatMessage::getMessage)
+                            .orElse("");
 
-                    // 상대방 정보 세팅
-                    User opponent = room.getMentor().getUserId().equals(userId) ? room.getMentee() : room.getMentor();
+                    // ② 상대방 정보
+                    User opponent = room.getMentor().getUserId().equals(userId)
+                            ? room.getMentee()
+                            : room.getMentor();
+
+                    // ③ 포트폴리오 리스트
+                    List<Long> portfolioIds = portfolioRepository.findAllByChatRoom(room).stream()
+                            .map(Portfolio::getPortfolioId)
+                            .collect(Collectors.toList());
 
                     return ChatRoomResponseDTO.builder()
                             .chatRoomId(room.getChatRoomId())
-                            .portfolioId(room.getPortfolio().getPortfolioId())
+                            .portfolioIds(portfolioIds)
                             .mentorId(room.getMentor().getUserId())
                             .menteeId(room.getMentee().getUserId())
                             .senderId(opponent.getUserId())
                             .senderNickname(opponent.getNickname())
                             .senderProfileImage(opponent.getProfileImage())
-                            .lastMessage(lastMessageContent)
+                            .lastMessage(lastMessageContent) // ✅ 항상 표시
                             .isActive(room.isActive())
                             .createdAt(room.getCreatedAt())
                             .updatedAt(room.getUpdatedAt())
                             .build();
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
+
 
     // 채팅방 종료
     @Transactional
@@ -150,7 +158,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private ChatRoomResponseDTO convertToDTO(ChatRoom room) {
         return ChatRoomResponseDTO.builder()
                 .chatRoomId(room.getChatRoomId())
-                .portfolioId(room.getPortfolio().getPortfolioId())
+                .portfolioIds(List.of(room.getPortfolio().getPortfolioId()))
                 .mentorId(room.getMentor().getUserId())
                 .menteeId(room.getMentee().getUserId())
                 .createdAt(room.getCreatedAt())

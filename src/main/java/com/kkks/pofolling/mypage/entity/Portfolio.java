@@ -1,5 +1,6 @@
 package com.kkks.pofolling.mypage.entity;
 
+import com.kkks.pofolling.chat.entity.ChatRoom;
 import com.kkks.pofolling.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,10 @@ public class Portfolio {
     private Long portfolioId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -48,7 +53,6 @@ public class Portfolio {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
 
     //==상태값 변경 메서드==//
     public void updateStatus(PortfolioStatus status) {

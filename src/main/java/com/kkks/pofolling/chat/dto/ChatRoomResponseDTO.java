@@ -3,6 +3,7 @@ package com.kkks.pofolling.chat.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter @Setter @Builder
 @AllArgsConstructor
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 public class ChatRoomResponseDTO {
 
     private Long chatRoomId;
-    private Long portfolioId;
+    private List<Long> portfolioIds;
     private Long mentorId;
     private Long menteeId;
     private Long senderId;

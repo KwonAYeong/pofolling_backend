@@ -1,5 +1,6 @@
 package com.kkks.pofolling.edit.service;
 
+import com.kkks.pofolling.chat.entity.ChatRoom;
 import com.kkks.pofolling.chat.service.ChatRoomService;
 import com.kkks.pofolling.edit.dto.EditDetailResponseDTO;
 import com.kkks.pofolling.edit.dto.EditListResponseDTO;
@@ -57,19 +58,21 @@ public class EditResponseServiceImpl implements EditResponseService{
     public void startEdit(Long mentorId, Long editRequestId) {
         User mentor = userRepository.findById(mentorId)
                 .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
-        EditRequest er = editRequestRepository.findById(editRequestId)
-                .orElseThrow(()-> new BusinessException(EDIT_NOT_FOUND));
+        EditRequest editRequest = editRequestRepository.findById(editRequestId)
+                .orElseThrow(() -> new BusinessException(EDIT_NOT_FOUND));
 
-        // 멘토 배정 및 상태 변경.
-        er.assignMentor(mentor);
-        er.getPortfolio().updateStatus(IN_PROGRESS);
+        // 멘토 배정 & 상태 변경
+        editRequest.assignMentor(mentor);
+        editRequest.getPortfolio().updateStatus(IN_PROGRESS);
 
-        // 채팅방 자동 생성
-        chatRoomService.createChatRoomIfNotExists (
+        // 채팅방 조회 또는 생성
+        ChatRoom chatRoom = chatRoomService.createChatRoomIfNotExists(
                 mentor.getUserId(),
-                er.getMentee().getUserId(),
-                er.getPortfolio().getPortfolioId()
+                editRequest.getMentee().getUserId()
         );
+
+        // 생성된 채팅방과 포트폴리오 연결
+        editRequest.getPortfolio().setChatRoom(chatRoom);
     }
 
 

@@ -1,6 +1,8 @@
 package com.kkks.pofolling.user.entity;
 
 
+import com.kkks.pofolling.mypage.entity.Career;
+import com.kkks.pofolling.mypage.entity.Education;
 import com.kkks.pofolling.user.entity.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +11,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Getter @Builder @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,6 +25,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", updatable = false)
     private Long userId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -37,21 +45,18 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private UserRole role;
-
-    @Column(name = "job_id")
-    private String jobId;
-
     @Column(name = "profile_image")
     private String profileImage;
 
-    @Column(name = "career")
-    private String career;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "job_type")
+    private JobType jobType;
 
-    @Column(name = "education")
-    private String education;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Education> educations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Career> careers = new ArrayList<>();
 
     @Column(name = "is_verified")
     private Boolean isVerified;

@@ -73,7 +73,14 @@ public class MypageProfileServiceImpl implements MypageProfileService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 
+        if (updateDTO.getName() != null && !updateDTO.getName().isBlank()) {
+            user.setName(updateDTO.getName());
+        }
+
         if (updateDTO.getNickname() != null && !updateDTO.getNickname().isBlank()) {
+            if (userRepository.existsByNickname(updateDTO.getNickname())) {
+                throw new BusinessException(ExceptionCode.NICKNAME_ALREADY_EXISTS);
+            }
             user.setNickname(updateDTO.getNickname());
         }
 

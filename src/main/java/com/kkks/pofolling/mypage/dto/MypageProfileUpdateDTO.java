@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MypageProfileUpdateDTO {
 
+    private String name;
     private String nickname;
     private String profileImage;
     private String phoneNumber;

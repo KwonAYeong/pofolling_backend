@@ -7,6 +7,12 @@ public enum ExceptionCode {
     // user
     MENTOR_NOT_FOUND(404, "MENTOR_NOT_FOUND", "해당 멘토가 존재하지 않습니다."),
     USER_NOT_FOUND(404, "USER_NOT_FOUND", "해당 사용자가 존재하지 않습니다."),
+    NICKNAME_ALREADY_EXISTS(400, "NICKNAME_ALREADY_EXISTS", "이미 사용 중인 닉네임입니다."),
+
+    // mypage-profile
+    MYPAGE_CAREER_NOT_FOUND(404, "MYPAGE_CAREER_NOT_FOUND", "해당 경력 정보가 존재하지 않습니다."),
+    MYPAGE_EDUCATION_NOT_FOUND(404, "MYPAGE_EDUCATION_NOT_FOUND", "해당 학력 정보가 존재하지 않습니다."),
+
 
     // portfolio
     PORTFOLIO_NOT_FOUND(404, "PORTFOLIO_NOT_FOUND", "해당 포트폴리오가 존재하지 않습니다."),
@@ -15,7 +21,6 @@ public enum ExceptionCode {
     // chat
     CHATROOM_NOT_FOUND(404, "CHATROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),
     CHATROOM_CLOSED(403, "CHATROOM_CLOSED", "첨삭이 종료된 채팅방입니다."),
-
 
     // edit
     INVALID_EDIT_STATE(400,"INVALID_EDIT_STATE","등록 상태인 프트폴리오만 첨삭을 요청할 수 있습니다."),

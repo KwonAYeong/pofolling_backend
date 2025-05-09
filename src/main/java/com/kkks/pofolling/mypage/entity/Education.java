@@ -42,6 +42,9 @@ public class Education {
     @Column(name = "graduation_date")
     private LocalDate graduationDate;
 
+    @Enumerated(EnumType.STRING)
+    private EducationStatus educationStatus;
+
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;

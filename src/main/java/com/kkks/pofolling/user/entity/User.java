@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity @Getter @Builder @ToString
+@Entity @Getter @Setter @Builder @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class) // createdAt, updatedAt 등 자동으로 현재 시간 설정해주는 JPA

@@ -18,6 +18,7 @@ public class ChatRoomResponseDTO {
     private String senderNickname;
     private String senderProfileImage;
     private String lastMessage;
+    private boolean hasNewMessage;
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

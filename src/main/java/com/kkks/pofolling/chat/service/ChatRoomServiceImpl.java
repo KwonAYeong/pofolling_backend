@@ -104,6 +104,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                             .findTopByChatRoomOrderBySentAtDesc(room);
                     String lastMessageContent = lastMessageOpt.map(ChatMessage::getMessage).orElse("");
 
+                    boolean hasNewMessage = lastMessageOpt.isPresent();
+
                     User opponent = room.getMentor().getUserId().equals(userId)
                             ? room.getMentee()
                             : room.getMentor();
@@ -122,6 +124,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                             .senderProfileImage(opponent.getProfileImage())
                             .lastMessage(lastMessageContent)
                             .isActive(room.isActive())
+                            .hasNewMessage(hasNewMessage)
                             .createdAt(room.getCreatedAt())
                             .updatedAt(room.getUpdatedAt())
                             .build();

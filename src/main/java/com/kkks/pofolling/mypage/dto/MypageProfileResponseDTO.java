@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MypageProfileResponseDTO {
 
-    private String name;
+    private String nickName;
     private String profileImage;
     private JobType jobType;
     private UserRole role;

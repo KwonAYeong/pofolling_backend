@@ -57,7 +57,7 @@ public class MypageProfileServiceImpl implements MypageProfileService{
                 .collect(Collectors.toList());
 
         return MypageProfileResponseDTO.builder()
-                .name(user.getName())
+                .nickName(user.getNickname())
                 .profileImage(user.getProfileImage())
                 .jobType(user.getJobType())
                 .role(user.getRole())

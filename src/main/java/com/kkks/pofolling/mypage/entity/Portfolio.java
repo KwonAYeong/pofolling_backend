@@ -36,10 +36,10 @@ public class Portfolio {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "file_url")
+    @Column(name = "file_url", nullable = false)
     private String fileUrl;
 
     @Enumerated(EnumType.STRING)
@@ -57,6 +57,18 @@ public class Portfolio {
     //==상태값 변경 메서드==//
     public void updateStatus(PortfolioStatus status) {
         this.status = status;
+    }
+
+    // 포트폴리오 수정
+    public void update(String title, String content, String fileUrl) {
+        this.title = title;
+        this.content = content;
+        this.fileUrl = fileUrl;
+    }
+
+    // 포트폴리오 삭제 (REGISTERED 인 상태에서만 삭제 가능)
+    public boolean isDeletable() {
+        return this.status == PortfolioStatus.REGISTERED;
     }
 
 }

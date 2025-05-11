@@ -4,8 +4,8 @@ import com.kkks.pofolling.exception.BusinessException;
 import com.kkks.pofolling.exception.ExceptionCode;
 import com.kkks.pofolling.mypage.dto.CareerDTO;
 import com.kkks.pofolling.mypage.dto.EducationDTO;
-import com.kkks.pofolling.mypage.dto.MypageProfileResponseDTO;
-import com.kkks.pofolling.mypage.dto.MypageProfileUpdateDTO;
+import com.kkks.pofolling.mypage.dto.ProfileResponseDTO;
+import com.kkks.pofolling.mypage.dto.ProfileUpdateDTO;
 import com.kkks.pofolling.mypage.entity.Career;
 import com.kkks.pofolling.mypage.entity.Education;
 import com.kkks.pofolling.mypage.repository.CareerRepository;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MypageProfileServiceImpl implements MypageProfileService{
+public class ProfileServiceImpl implements ProfileService {
 
     private final UserRepository userRepository;
     private final CareerRepository careerRepository;
@@ -30,7 +30,7 @@ public class MypageProfileServiceImpl implements MypageProfileService{
     // 마이페이지 - 프로필 조회
     @Override
     @Transactional
-    public MypageProfileResponseDTO getProfile(Long userId) {
+    public ProfileResponseDTO getProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 
@@ -56,7 +56,7 @@ public class MypageProfileServiceImpl implements MypageProfileService{
                         .build())
                 .collect(Collectors.toList());
 
-        return MypageProfileResponseDTO.builder()
+        return ProfileResponseDTO.builder()
                 .nickName(user.getNickname())
                 .profileImage(user.getProfileImage())
                 .jobType(user.getJobType())
@@ -69,7 +69,7 @@ public class MypageProfileServiceImpl implements MypageProfileService{
     // 마이페이지 - 프로필 수정
     @Override
     @Transactional
-    public void updateProfile(Long userId, MypageProfileUpdateDTO updateDTO) {
+    public void updateProfile(Long userId, ProfileUpdateDTO updateDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 

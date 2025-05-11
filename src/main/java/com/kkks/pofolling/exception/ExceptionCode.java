@@ -17,6 +17,11 @@ public enum ExceptionCode {
     // portfolio
     PORTFOLIO_NOT_FOUND(404, "PORTFOLIO_NOT_FOUND", "해당 포트폴리오가 존재하지 않습니다."),
     INVALID_PORTFOLIO_STATUS(400, "INVALID_PORTFOLIO_STATUS", "첨삭 요청 상태인 포트폴리오만 첨삭을 시작할 수 있습니다."),
+    PORTFOLIO_CANNOT_BE_MODIFIED(400, "PORTFOLIO_CANNOT_BE_MODIFIED", "현재 상태에서는 포트폴리오를 수정할 수 없습니다."),
+    PORTFOLIO_CANNOT_BE_DELETED(400, "PORTFOLIO_CANNOT_BE_DELETED", "현재 상태에서는 포트폴리오를 삭제할 수 없습니다."),
+    INVALID_INPUT_VALUE(400, "INVALID_INPUT_VALUE", "필수 입력 항목을 모두 입력해 주세요."),
+
+
 
     // chat
     CHATROOM_NOT_FOUND(404, "CHATROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),

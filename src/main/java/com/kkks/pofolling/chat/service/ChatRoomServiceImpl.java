@@ -102,9 +102,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .map(room -> {
                     Optional<ChatMessage> lastMessageOpt = chatMessageRepository
                             .findTopByChatRoomOrderBySentAtDesc(room);
-                    String lastMessageContent = lastMessageOpt.map(ChatMessage::getMessage).orElse("");
 
-                    boolean hasNewMessage = lastMessageOpt.isPresent();
+                    // 현재 사용자 기준으로 메세지 내용과 새 메세지 여부 처리
+                    String lastMessageContent = lastMessageOpt
+                            .map(msg -> msg.getSender().getUserId().equals(userId)
+                                    ? msg.getMessage()
+                                    : "새 메세지가 도착했습니다.")
+                            .orElse("");
+
+                    boolean hasNewMessage = lastMessageOpt
+                            .map(msg -> !msg.getSender().getUserId().equals(userId))
+                            .orElse(false);
 
                     User opponent = room.getMentor().getUserId().equals(userId)
                             ? room.getMentee()
@@ -123,8 +131,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                             .senderNickname(opponent.getNickname())
                             .senderProfileImage(opponent.getProfileImage())
                             .lastMessage(lastMessageContent)
-                            .isActive(room.isActive())
                             .hasNewMessage(hasNewMessage)
+                            .isActive(room.isActive())
                             .createdAt(room.getCreatedAt())
                             .updatedAt(room.getUpdatedAt())
                             .build();

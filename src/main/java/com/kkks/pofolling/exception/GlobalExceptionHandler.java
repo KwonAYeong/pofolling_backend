@@ -2,6 +2,7 @@ package com.kkks.pofolling.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -25,5 +26,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ExceptionCode.UNKNOWN_ERROR.getStatus())
                 .body(ErrorResponse.of(ExceptionCode.UNKNOWN_ERROR));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
+
+        return ErrorResponse.of(ExceptionCode.INVALID_INPUT_VALUE, errorMessage);
     }
 }

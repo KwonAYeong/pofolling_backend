@@ -142,14 +142,38 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     // 채팅방 종료 → 모든 연결된 포트폴리오 상태 COMPLETED 처리
     @Transactional
-    public void deactivateChatRoom(Long chatRoomId) {
+    public ChatRoomResponseDTO deactivateChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.CHATROOM_NOT_FOUND));
 
         chatRoom.deactivate();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
         List<Portfolio> portfolios = portfolioRepository.findAllByChatRoom(chatRoom);
         portfolios.forEach(p -> p.updateStatus(PortfolioStatus.COMPLETED));
+
+        // 최근 메시지 조회
+        Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderBySentAtDesc(savedChatRoom);
+        User sender = lastMessageOpt.map(ChatMessage::getSender).orElse(savedChatRoom.getMentee());
+        String lastMessageText = lastMessageOpt.map(ChatMessage::getMessage).orElse(null);
+
+        // 최신 상태 반환
+        return new ChatRoomResponseDTO(
+                savedChatRoom.getChatRoomId(),
+                savedChatRoom.getPortfolios().stream()
+                        .map(Portfolio::getPortfolioId)
+                        .collect(Collectors.toList()),
+                savedChatRoom.getMentor().getUserId(),
+                savedChatRoom.getMentee().getUserId(),
+                sender.getUserId(),
+                sender.getNickname(),
+                sender.getProfileImage(),
+                lastMessageText,
+                false,
+                savedChatRoom.isActive(),
+                savedChatRoom.getCreatedAt(),
+                savedChatRoom.getUpdatedAt()
+        );
     }
 
     // 공통 DTO 변환

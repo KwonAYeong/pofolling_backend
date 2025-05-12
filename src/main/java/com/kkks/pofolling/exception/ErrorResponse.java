@@ -21,4 +21,8 @@ public class ErrorResponse {
                 .message(code.getMessage())
                 .build();
     }
+
+    public static ErrorResponse of(ExceptionCode exceptionCode, String customMessage) {
+        return new ErrorResponse(exceptionCode.getStatus(), exceptionCode.getCode(), customMessage);
+    }
 }

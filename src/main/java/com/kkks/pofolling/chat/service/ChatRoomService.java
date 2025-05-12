@@ -10,5 +10,5 @@ public interface ChatRoomService {
     ChatRoomResponseDTO createChatRoom(Long mentorId, Long portfolioId);
     ChatRoom createChatRoomIfNotExists(Long mentorId, Long menteeId);
     List<ChatRoomResponseDTO> findAllChatRoomsByUserId(Long userId);
-    void deactivateChatRoom(Long chatRoomId);
+    ChatRoomResponseDTO deactivateChatRoom(Long chatRoomId);
 }

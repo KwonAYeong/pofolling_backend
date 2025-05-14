@@ -21,7 +21,9 @@ public enum ExceptionCode {
     PORTFOLIO_CANNOT_BE_DELETED(400, "PORTFOLIO_CANNOT_BE_DELETED", "현재 상태에서는 포트폴리오를 삭제할 수 없습니다."),
     INVALID_INPUT_VALUE(400, "INVALID_INPUT_VALUE", "필수 입력 항목을 모두 입력해 주세요."),
 
-
+    // community
+    FILE_UPLOAD_FAILED(400,"FILE_UPLOAD_FAILED","파일 업로드에 실패했습니다."),
+    FILE_DELETE_FAILED(400, "FILE_DELETE_FAILED", "S3 파일 삭제 중 오류 발생."),
 
     // chat
     CHATROOM_NOT_FOUND(404, "CHATROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),

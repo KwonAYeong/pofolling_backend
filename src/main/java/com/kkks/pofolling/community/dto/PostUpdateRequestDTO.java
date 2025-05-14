@@ -1,5 +1,6 @@
 package com.kkks.pofolling.community.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,9 +13,9 @@ public class PostUpdateRequestDTO {
     private String title;
     private String content;
 
-    // 삭제할 파일의 위치를 나타냄: 예) "fileUrl2", "fileUrl3"
-    private List<String> deleteFilePosition;
+    // 삭제할 파일의 S3 URL 목록
+    private List<String> deleteFileUrls;
 
-    // 수정할 파일의 위치를 나타냄: 예) fileUrl1: exampleFile.pdf
-    private Map<String, MultipartFile> updatedFiles;
+    // 업데이트할 파일의 포지션 (예: fileUrl1) → 파일명 (예: image1.jpg)
+    private Map<String, String> updatedFilePositions;
 }

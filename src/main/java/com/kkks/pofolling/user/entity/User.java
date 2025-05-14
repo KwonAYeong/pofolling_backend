@@ -5,6 +5,7 @@ import com.kkks.pofolling.mypage.entity.Career;
 import com.kkks.pofolling.mypage.entity.Education;
 import com.kkks.pofolling.user.entity.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -39,6 +40,7 @@ public class User {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$", message = "닉네임은 2~10자의 한글, 영문, 숫자만 입력 가능합니다.")
     @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 

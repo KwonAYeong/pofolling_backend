@@ -6,6 +6,7 @@ import com.kkks.pofolling.community.repository.PostRepository;
 import com.kkks.pofolling.community.repository.ReplyRepository;
 import com.kkks.pofolling.exception.BusinessException;
 import com.kkks.pofolling.exception.ExceptionCode;
+import com.kkks.pofolling.s3.S3Uploader;
 import com.kkks.pofolling.user.entity.User;
 import com.kkks.pofolling.user.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,13 +33,15 @@ public class PostServiceImpl implements PostService{
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
     private final FileService fileService;
+    private final S3Uploader s3Uploader;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, ReplyRepository repository, FileService fileService) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, ReplyRepository repository, FileService fileService, S3Uploader s3Uploader) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.replyRepository = repository;
         this.fileService = fileService;
+        this.s3Uploader = s3Uploader;
     }
 
     @Override
@@ -53,21 +57,25 @@ public class PostServiceImpl implements PostService{
                 .user(user)
                 .build();
 
-        // 파일 처리 (S3 연동 전: URL 더미로 넣거나 생략 가능)
         List<MultipartFile> files = dto.getFiles();
         if (files != null && !files.isEmpty()) {
-            // 파일이 3개 이하일 때만 URL 저장
             for (int i = 0; i < Math.min(3, files.size()); i++) {
                 MultipartFile file = files.get(i);
-                // 실제 업로드는 아직 X
-                String fakeUrl = "https://dummy.url/file" + (i + 1);
-                switch (i) {
-                    case 0 -> post.setFileUrl1(fakeUrl);
-                    case 1 -> post.setFileUrl2(fakeUrl);
-                    case 2 -> post.setFileUrl3(fakeUrl);
+
+                try {
+                    String uploadedUrl = s3Uploader.upload(file, "community");
+                    switch (i) {
+                        case 0 -> post.setFileUrl1(uploadedUrl);
+                        case 1 -> post.setFileUrl2(uploadedUrl);
+                        case 2 -> post.setFileUrl3(uploadedUrl);
+                    }
+                } catch (IOException e) {
+                    throw new BusinessException(ExceptionCode.FILE_UPLOAD_FAILED);
                 }
+
             }
         }
+
 
         // 게시글 저장
         postRepository.save(post);
@@ -75,7 +83,7 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public void updatePost(Long postId, Long userId, PostUpdateRequestDTO dto) {
+    public void updatePost(Long postId, Long userId, PostUpdateRequestDTO dto, List<MultipartFile> files) {
         // 게시글 조회
         Post post = postRepository.findById(postId).
                 orElseThrow(() -> new BusinessException(ExceptionCode.UNKNOWN_ERROR));
@@ -88,35 +96,18 @@ public class PostServiceImpl implements PostService{
         // 게시글 업데이트
         post.update(dto.getTitle(), dto.getContent());
 
-        // 파일 삭제 로직
-        if (dto.getDeleteFilePosition() != null) {
-            for (String position : dto.getDeleteFilePosition()) {
-                switch (position) {
-                    case "fileUrl1" -> post.setFileUrl1(null);
-                    case "fileUrl2" -> post.setFileUrl2(null);
-                    case "fileUrl3" -> post.setFileUrl3(null);
-                }
-            }
+        // 선택된 파일 삭제 로직
+        deleteSelectedPostFiles(dto, post);
 
-            // 추후 S3 삭제 로직 추가 필요.
-        }
+        // 파일 재등록 로직
+        replacePostFiles(dto, files, post);
 
-        if (dto.getUpdatedFiles() != null) {
-            for (Map.Entry<String, MultipartFile> entry : dto.getUpdatedFiles().entrySet()) {
-                String position = entry.getKey();
-                MultipartFile file = entry.getValue();
 
-                String uploadedUrl = fileService.uploadFile(file);
-
-                switch (position) {
-                    case "fileUrl1" -> post.setFileUrl1(uploadedUrl);
-                    case "fileUrl2" -> post.setFileUrl2(uploadedUrl);
-                    case "fileUrl3" -> post.setFileUrl3(uploadedUrl);
-                }
-            }
-        }
         log.info("success for updatePost");
     }
+
+
+
 
     @Override
     public void deletePost(Long postId, Long userId) {
@@ -186,8 +177,69 @@ public class PostServiceImpl implements PostService{
                 ).filter(Objects::nonNull)
                 .toList();
         for (String fileUrl : fileUrls) {
-            if (fileUrl != null) {
-                fileService.deleteFile(fileUrl);
+            try {
+                s3Uploader.delete(fileUrl); // 바로 S3Uploader 사용
+            } catch (Exception e) {
+                throw new BusinessException(ExceptionCode.FILE_DELETE_FAILED);
+
+            }
+        }
+    }
+
+    private void replacePostFiles(PostUpdateRequestDTO dto, List<MultipartFile> files, Post post) {
+        if (files != null && dto.getUpdatedFilePositions() != null) {
+            for (MultipartFile file : files) {
+                String originalName = file.getOriginalFilename();
+
+                for (Map.Entry<String, String> entry : dto.getUpdatedFilePositions().entrySet()) {
+                    String position = entry.getKey(); // ex: fileUrl1
+                    String expectedFilename = entry.getValue(); // ex: image1.jpg
+
+                    if (expectedFilename.equals(originalName)) {
+                        // 기존 파일 삭제
+                        String oldUrl = switch (position) {
+                            case "fileUrl1" -> post.getFileUrl1();
+                            case "fileUrl2" -> post.getFileUrl2();
+                            case "fileUrl3" -> post.getFileUrl3();
+                            default -> null;
+                        };
+
+                        if (oldUrl != null) {
+                            try {
+                                s3Uploader.delete(oldUrl);
+                            } catch (Exception e) {
+                                throw new BusinessException(ExceptionCode.FILE_DELETE_FAILED);
+                            }
+                        }
+
+                        // 새 파일 업로드
+                        String uploadedUrl;
+                        try {
+                            uploadedUrl = s3Uploader.upload(file, "community");
+                        } catch (IOException e) {
+                            throw new BusinessException(ExceptionCode.FILE_UPLOAD_FAILED);
+                        }
+
+                        // 업로드된 URL을 포지션에 맞게 반영
+                        switch (position) {
+                            case "fileUrl1" -> post.setFileUrl1(uploadedUrl);
+                            case "fileUrl2" -> post.setFileUrl2(uploadedUrl);
+                            case "fileUrl3" -> post.setFileUrl3(uploadedUrl);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void deleteSelectedPostFiles(PostUpdateRequestDTO dto, Post post) {
+        if (dto.getDeleteFileUrls() != null) {
+            for (String url : dto.getDeleteFileUrls()) {
+                if (url.equals(post.getFileUrl1())) post.setFileUrl1(null);
+                if (url.equals(post.getFileUrl2())) post.setFileUrl2(null);
+                if (url.equals(post.getFileUrl3())) post.setFileUrl3(null);
+
+                s3Uploader.delete(url);
             }
         }
     }

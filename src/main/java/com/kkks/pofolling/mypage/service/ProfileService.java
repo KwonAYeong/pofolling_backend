@@ -6,4 +6,5 @@ import com.kkks.pofolling.mypage.dto.ProfileUpdateDTO;
 public interface ProfileService {
     ProfileResponseDTO getProfile(Long userId);
     void updateProfile(Long userId, ProfileUpdateDTO updateDTO);
+    boolean isNicknameAvailable(Long userId, String nickname);
 }

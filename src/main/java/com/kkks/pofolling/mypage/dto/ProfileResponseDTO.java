@@ -11,8 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 public class ProfileResponseDTO {
 
+    private String name;
+    private String email;
     private String nickName;
     private String profileImage;
+    private String  phoneNumber;
     private JobType jobType;
     private UserRole role;
     private List<CareerDTO> careers;

@@ -78,7 +78,9 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         if (updateDTO.getNickname() != null && !updateDTO.getNickname().isBlank()) {
-            if (userRepository.existsByNickname(updateDTO.getNickname())) {
+            // 현재 닉네임과 다를 때만 중복 체크
+            if (!user.getNickname().equals(updateDTO.getNickname())
+                    && userRepository.existsByNickname(updateDTO.getNickname())) {
                 throw new BusinessException(ExceptionCode.NICKNAME_ALREADY_EXISTS);
             }
             user.setNickname(updateDTO.getNickname());
@@ -96,9 +98,8 @@ public class ProfileServiceImpl implements ProfileService {
             user.setJobType(updateDTO.getJobType());
         }
 
-        // 추후 인코딩 필요
         if (updateDTO.getPassword() != null && !updateDTO.getPassword().isBlank()) {
-            user.setPassword(updateDTO.getPassword());
+            user.setPassword(updateDTO.getPassword()); // 추후 인코딩 필요
         }
 
         if (updateDTO.getCareers() != null && !updateDTO.getCareers().isEmpty()) {
@@ -112,9 +113,6 @@ public class ProfileServiceImpl implements ProfileService {
                             .endedAt(dto.getEndedAt())
                             .build())
                     .collect(Collectors.toList());
-            if (careers.isEmpty()) {
-                throw new BusinessException(ExceptionCode.MYPAGE_CAREER_NOT_FOUND);
-            }
             careerRepository.saveAll(careers);
         }
 
@@ -131,14 +129,23 @@ public class ProfileServiceImpl implements ProfileService {
                             .educationStatus(dto.getEducationStatus())
                             .build())
                     .collect(Collectors.toList());
-            if (educations.isEmpty()) {
-                throw new BusinessException(ExceptionCode.MYPAGE_EDUCATION_NOT_FOUND);
-            }
             educationRepository.saveAll(educations);
         }
     }
 
+    // 닉네임 중복 확인
+    @Override
+    public boolean isNicknameAvailable(Long userId, String nickname) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 
+        // 현재 닉네임이면 사용 가능
+        if (user.getNickname().equals(nickname)) {
+            return true;
+        }
 
+        // 다른 사람이 사용 중인지 확인
+        return !userRepository.existsByNickname(nickname);
+    }
 
 }

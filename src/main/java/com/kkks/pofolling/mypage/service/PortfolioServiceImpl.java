@@ -1,5 +1,7 @@
 package com.kkks.pofolling.mypage.service;
 
+import com.kkks.pofolling.edit.entity.EditRequest;
+import com.kkks.pofolling.edit.repository.EditRequestRepository;
 import com.kkks.pofolling.exception.BusinessException;
 import com.kkks.pofolling.exception.ExceptionCode;
 import com.kkks.pofolling.mypage.dto.*;
@@ -22,6 +24,7 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final EditRequestRepository editRequestRepository;
 
 
     // 포트폴리오 등록
@@ -66,21 +69,50 @@ public class PortfolioServiceImpl implements PortfolioService {
                 .collect(Collectors.toList());
     }
 
-    // 포트폴리오 상세 조회
+    // 포트폴리오 상세 조회 (멘티용)
     @Override
     @Transactional(readOnly = true)
-    public PortfolioDetailResponseDTO getPortfolioDetail(Long portfolioId) {
+    public PortfolioMenteeDetailResponseDTO getMenteePortfolioDetail(Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
 
-        return PortfolioDetailResponseDTO.builder()
+        User mentee = portfolio.getUser();
+
+        boolean canEdit = portfolio.getStatus() == PortfolioStatus.REGISTERED || portfolio.getStatus() == PortfolioStatus.COMPLETED;
+        boolean canDelete = portfolio.getStatus() == PortfolioStatus.REGISTERED;
+
+        return PortfolioMenteeDetailResponseDTO.builder()
                 .portfolioId(portfolio.getPortfolioId())
                 .title(portfolio.getTitle())
                 .content(portfolio.getContent())
                 .fileUrl(portfolio.getFileUrl())
+                .profileImage(mentee.getProfileImage())
+                .nickname(mentee.getNickname())
                 .status(portfolio.getStatus())
-                .createdAt(portfolio.getCreatedAt())
                 .updatedAt(portfolio.getUpdatedAt())
+                .canEdit(canEdit)
+                .canDelete(canDelete)
+                .build();
+    }
+
+    // 포트폴리오 상세 조회 (멘토용)
+    @Override
+    @Transactional(readOnly = true)
+    public PortfolioMentorDetailResponseDTO getMentorPortfolioDetail(Long editRequestId) {
+        EditRequest editRequest = editRequestRepository.findById(editRequestId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.EDIT_NOT_FOUND));
+
+        Portfolio portfolio = editRequest.getPortfolio();
+        User mentee = portfolio.getUser();
+
+        return PortfolioMentorDetailResponseDTO.builder()
+                .portfolioId(portfolio.getPortfolioId())
+                .title(portfolio.getTitle())
+                .content(portfolio.getContent())
+                .fileUrl(portfolio.getFileUrl())
+                .profileImage(mentee.getProfileImage())
+                .nickname(mentee.getNickname())
+                .requestedAt(editRequest.getRequestedAt())
                 .build();
     }
 

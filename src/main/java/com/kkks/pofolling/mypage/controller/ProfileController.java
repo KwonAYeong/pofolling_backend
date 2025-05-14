@@ -19,6 +19,7 @@ public class ProfileController {
 
     private final ProfileService mypageProfileService;
     private final UserRepository userRepository;
+    private final ProfileService profileService;
 
     // 마이페이지 - 프로필 조회
     @GetMapping("/{userId}")
@@ -37,12 +38,10 @@ public class ProfileController {
 
     // 닉네임 중복 확인
     @GetMapping("/check-nickname")
-    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam String nickname) {
-        boolean isAvailable = !userRepository.existsByNickname(nickname);
-        if (!isAvailable) {
-            throw new BusinessException(ExceptionCode.NICKNAME_ALREADY_EXISTS);
-        }
-        return ResponseEntity.ok(Map.of("isAvailable", true));
+    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam Long userId, @RequestParam String nickname) {
+        boolean isAvailable = profileService.isNicknameAvailable(userId, nickname);
+
+        return ResponseEntity.ok(Map.of("isAvailable", isAvailable));
     }
 
 

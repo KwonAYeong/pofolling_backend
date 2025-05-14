@@ -4,6 +4,7 @@ import com.kkks.pofolling.mypage.dto.PortfolioCreateDTO;
 import com.kkks.pofolling.mypage.dto.PortfolioDetailResponseDTO;
 import com.kkks.pofolling.mypage.dto.PortfolioListResponseDTO;
 import com.kkks.pofolling.mypage.dto.PortfolioUpdateDTO;
+import com.kkks.pofolling.mypage.entity.PortfolioStatus;
 import com.kkks.pofolling.mypage.service.PortfolioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,9 @@ public class PortfolioController {
 
     // 포트폴리오 목록 조회
     @GetMapping("/list")
-    public ResponseEntity<List<PortfolioListResponseDTO>> getMyPortfolios(@RequestParam Long userId) {
-        List<PortfolioListResponseDTO> portfolios = portfolioService.getMyPortfolios(userId);
+    public ResponseEntity<List<PortfolioListResponseDTO>> getMyPortfolios(@RequestParam Long userId,
+                                                                          @RequestParam(required = false)PortfolioStatus status) {
+        List<PortfolioListResponseDTO> portfolios = portfolioService.getMyPortfolios(userId, status);
 
         return ResponseEntity.ok(portfolios);
     }

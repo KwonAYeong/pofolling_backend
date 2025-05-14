@@ -44,11 +44,19 @@ public class PortfolioServiceImpl implements PortfolioService {
     // 포트폴리오 목록 조회
     @Override
     @Transactional(readOnly = true)
-    public List<PortfolioListResponseDTO> getMyPortfolios(Long userId) {
+    public List<PortfolioListResponseDTO> getMyPortfolios(Long userId, PortfolioStatus status) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 
-        return portfolioRepository.findByUser(user).stream()
+        List<Portfolio> portfolios;
+
+        if (status == null) {
+            portfolios = portfolioRepository.findByUser(user);
+        } else  {
+            portfolios = portfolioRepository.findByUserAndStatus(user, status);
+        }
+
+        return portfolios.stream()
                 .map(p -> PortfolioListResponseDTO.builder()
                         .portfolioId(p.getPortfolioId())
                         .title(p.getTitle())

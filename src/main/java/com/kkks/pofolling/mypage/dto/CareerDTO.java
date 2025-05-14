@@ -11,6 +11,7 @@ public class CareerDTO {
 
     private Long careerId;
     private String companyName;
+    private String department;
     private String position;
     private LocalDate startedAt;
     private LocalDate endedAt;

@@ -29,6 +29,9 @@ public class Career {
     @Column(name = "company_name")
     private String companyName;
 
+    @Column(name = "department")
+    private String department;
+
     @Column(name = "position")
     private String position;
 

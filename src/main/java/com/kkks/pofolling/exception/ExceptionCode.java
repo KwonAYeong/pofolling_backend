@@ -24,7 +24,9 @@ public enum ExceptionCode {
     POST_NOT_FOUND(400,"POST_NOT_FOUND","해당 게시글이 존재하지 않습니다."),
     FILE_UPLOAD_FAILED(400,"FILE_UPLOAD_FAILED","파일 업로드에 실패했습니다."),
     FILE_DELETE_FAILED(400, "FILE_DELETE_FAILED", "S3 파일 삭제 중 오류 발생."),
-
+    UNAUTHORIZED_POST(403, "UNAUTHORIZED_POST", "해당 게시글의 소유자가 아닙니다"),
+    UNAUTHORIZED_REPLY(403, "UNAUTHORIZED_REPLY", "해당 댓글의 소유자가 아닙니다"),
+    REPLY_NOT_FOUND(400, "REPLY_NOT_FOUND", "해당 댓글이 존재하지 않습니다."),
     // chat
     CHATROOM_NOT_FOUND(404, "CHATROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),
     CHATROOM_CLOSED(403, "CHATROOM_CLOSED", "첨삭이 종료된 채팅방입니다."),

@@ -84,11 +84,11 @@ public class PostServiceImpl implements PostService{
     public void updatePost(Long postId, Long userId, PostUpdateRequestDTO dto, List<MultipartFile> files) {
         // 게시글 조회
         Post post = postRepository.findById(postId).
-                orElseThrow(() -> new BusinessException(ExceptionCode.UNKNOWN_ERROR));
+                orElseThrow(() -> new BusinessException(ExceptionCode.POST_NOT_FOUND));
 
         // 작성자 확인
         if (!post.getUser().getUserId().equals(userId)) {
-            throw new BusinessException(ExceptionCode.UNKNOWN_ERROR);
+            throw new BusinessException(ExceptionCode.UNAUTHORIZED_POST);
         }
 
         // 게시글 업데이트
@@ -131,7 +131,7 @@ public class PostServiceImpl implements PostService{
     public PostDetailResponseDTO getPostDetail(Long postId) {
         // 게시글 조회
         Post post = postRepository.findById(postId).
-                orElseThrow(() -> new BusinessException(ExceptionCode.UNKNOWN_ERROR));
+                orElseThrow(() -> new BusinessException(ExceptionCode.POST_NOT_FOUND));
 
         // 댓글들 가져오기
         List<ReplyResponseDTO> replyResponseDTOS = replyRepository.findAllByPost_PostIdOrderByCreatedAtAsc(postId)
@@ -159,7 +159,7 @@ public class PostServiceImpl implements PostService{
         }
 
         Post post = postRepository.findById(postId).
-                orElseThrow(() -> new BusinessException(ExceptionCode.UNKNOWN_ERROR));
+                orElseThrow(() -> new BusinessException(ExceptionCode.POST_NOT_FOUND));
         post.increaseViewCount();
 
         session.setAttribute(key, true);

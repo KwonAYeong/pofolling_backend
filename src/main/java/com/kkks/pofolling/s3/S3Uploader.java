@@ -14,14 +14,10 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class S3Uploader {
     private final S3Client s3Client;
     private final String bucket = "pofolling-bucket";
-
-    @Autowired
-    public S3Uploader(S3Client s3Client) {
-        this.s3Client = s3Client;
-    }
 
     // 파일 업로드 로직
     public String upload(MultipartFile file, String dirName) throws IOException {

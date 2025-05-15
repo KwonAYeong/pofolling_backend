@@ -78,6 +78,11 @@ public class Post {
     public void updateReplyCount(int change) {
         this.replyCount = Math.max(0, this.replyCount + change);
     }
+
+    //==Post 좋아요 수 변동 메서드==//
+    public void updateLikeCount(int change) {
+        this.likeCount = Math.max(0, this.likeCount + change);
+    }
 }
 
 

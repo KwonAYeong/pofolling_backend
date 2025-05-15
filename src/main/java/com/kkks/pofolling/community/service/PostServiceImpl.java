@@ -32,15 +32,13 @@ public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
-    private final FileService fileService;
     private final S3Uploader s3Uploader;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, ReplyRepository repository, FileService fileService, S3Uploader s3Uploader) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, ReplyRepository repository, S3Uploader s3Uploader) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.replyRepository = repository;
-        this.fileService = fileService;
         this.s3Uploader = s3Uploader;
     }
 

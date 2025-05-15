@@ -21,6 +21,7 @@ public enum ExceptionCode {
     INVALID_INPUT_VALUE(400, "INVALID_INPUT_VALUE", "필수 입력 항목을 모두 입력해 주세요."),
 
     // community
+    POST_NOT_FOUND(400,"POST_NOT_FOUND","해당 게시글이 존재하지 않습니다."),
     FILE_UPLOAD_FAILED(400,"FILE_UPLOAD_FAILED","파일 업로드에 실패했습니다."),
     FILE_DELETE_FAILED(400, "FILE_DELETE_FAILED", "S3 파일 삭제 중 오류 발생."),
 

@@ -35,7 +35,7 @@ public class EditRequestServiceImpl implements EditRequestService{
     public List<RegisteredPortfolioResponseDTO> getRegisteredPf(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
-        List<Portfolio> portfolios = portfolioRepository.findByUserAndStatusIn(user, List.of(REGISTERED, COMPLETED));
+        List<Portfolio> portfolios = portfolioRepository.findByUserAndStatusIn(user, List.of(REGISTERED, COMPLETED, REQUESTED));
 
         return getDtoList(portfolios);
     }

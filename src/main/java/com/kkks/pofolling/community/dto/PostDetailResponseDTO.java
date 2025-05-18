@@ -25,11 +25,12 @@ public class PostDetailResponseDTO {
     private LocalDateTime createdAt;
     private Integer viewCount;
     private List<String> fileUrls;
+    private boolean isLiked;
 
     // 댓글들
     private List<ReplyResponseDTO> replies;
 
-    public static PostDetailResponseDTO from(Post post, List<ReplyResponseDTO> replies) {
+    public static PostDetailResponseDTO of(Post post, List<ReplyResponseDTO> replies, boolean isLiked) {
         User user = post.getUser();
 
         // 첨부 파일 URL 리스트 생성
@@ -47,6 +48,7 @@ public class PostDetailResponseDTO {
                 post.getCreatedAt(),
                 post.getViewCount(),
                 fileUrls,
+                isLiked,
                 replies
         );
     }

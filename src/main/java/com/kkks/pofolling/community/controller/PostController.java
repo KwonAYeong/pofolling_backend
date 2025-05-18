@@ -63,14 +63,16 @@ public class PostController {
     }
 
     // 게시글 상세 정보 가져오기
-    @GetMapping("/{postId}")
+    @GetMapping("/{postId}/{userId}")
     public ResponseEntity<ComApiResponse<PostDetailResponseDTO>> getPostDetail(
-            @PathVariable Long postId, HttpSession httpSession
+            @PathVariable Long postId,
+            @PathVariable Long userId,
+            HttpSession httpSession
     ) {
         // 조회수 증가 로직
         postService.increaseViewCount(postId,httpSession);
 
-        PostDetailResponseDTO result = postService.getPostDetail(postId);
+        PostDetailResponseDTO result = postService.getPostDetail(postId, userId);
         return ResponseEntity.ok(ComApiResponse.success(result));
     }
 

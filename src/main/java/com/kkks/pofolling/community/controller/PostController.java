@@ -16,6 +16,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/community/post")
@@ -72,7 +75,7 @@ public class PostController {
     }
 
     //게시글 등록 요청
-    @PostMapping("/create/{userId}")
+    @PostMapping("/{userId}")
     public ResponseEntity<ComApiResponse<Void>> registerPost(
             @Parameter(description = "게시글 작성 데이터", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
             @ModelAttribute PostCreateRequestDTO dto,
@@ -83,13 +86,14 @@ public class PostController {
     }
 
     // 게시글 수정 요청
-    @PatchMapping("/update/{postId}/{userId}")
+    @PatchMapping(value = "/{postId}/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ComApiResponse<Void>> updatePost(
             @PathVariable Long postId,
             @PathVariable Long userId,
-            @ModelAttribute PostUpdateRequestDTO dto
+            @RequestPart("data") PostUpdateRequestDTO dto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) {
-        postService.updatePost(postId, userId, dto);
+        postService.updatePost(postId, userId, dto, files);
         return ResponseEntity.ok(ComApiResponse.successWithMessage(204, "게시글이 수정되었습니다."));
     }
 

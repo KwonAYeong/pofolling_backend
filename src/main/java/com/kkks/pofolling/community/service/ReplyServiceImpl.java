@@ -34,7 +34,7 @@ public class ReplyServiceImpl implements ReplyService{
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
         // 게시글 조회
         Post post = postRepository.findById(postId).
-                orElseThrow(() -> new BusinessException(ExceptionCode.UNKNOWN_ERROR));
+                orElseThrow(() -> new BusinessException(ExceptionCode.POST_NOT_FOUND));
 
         // 댓글 생성 로직
         Reply reply = Reply.builder()
@@ -54,11 +54,11 @@ public class ReplyServiceImpl implements ReplyService{
     public ReplyResponseDTO updateReply(String content, Long replyId, Long userId) {
         // 댓글 조회
         Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.REPLY_NOT_FOUND));
 
         // 작성자 확인
         if (!reply.getUser().getUserId().equals(userId)) {
-            throw new BusinessException(ExceptionCode.UNKNOWN_ERROR);
+            throw new BusinessException(ExceptionCode.UNAUTHORIZED_REPLY);
         }
 
         // 댓글 수정
@@ -70,11 +70,11 @@ public class ReplyServiceImpl implements ReplyService{
     public void deleteReply(Long replyId, Long userId) {
         // 댓글 조회
         Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ExceptionCode.REPLY_NOT_FOUND));
 
         // 작성자 확인
         if (!reply.getUser().getUserId().equals(userId)) {
-            throw new BusinessException(ExceptionCode.UNKNOWN_ERROR);
+            throw new BusinessException(ExceptionCode.UNAUTHORIZED_REPLY);
         }
 
         // 댓글 삭제

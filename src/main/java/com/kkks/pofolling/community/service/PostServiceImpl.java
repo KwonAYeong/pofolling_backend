@@ -2,6 +2,7 @@ package com.kkks.pofolling.community.service;
 
 import com.kkks.pofolling.community.dto.*;
 import com.kkks.pofolling.community.entity.Post;
+import com.kkks.pofolling.community.repository.PostLikeRepository;
 import com.kkks.pofolling.community.repository.PostRepository;
 import com.kkks.pofolling.community.repository.ReplyRepository;
 import com.kkks.pofolling.exception.BusinessException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,13 +30,15 @@ import java.util.stream.Stream;
 @Slf4j
 public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
     private final ReplyRepository replyRepository;
     private final FileService fileService;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, ReplyRepository repository, FileService fileService) {
+    public PostServiceImpl(PostRepository postRepository, PostLikeRepository postLikeRepository, UserRepository userRepository, ReplyRepository repository, FileService fileService) {
         this.postRepository = postRepository;
+        this.postLikeRepository = postLikeRepository;
         this.userRepository = userRepository;
         this.replyRepository = repository;
         this.fileService = fileService;
@@ -158,6 +162,20 @@ public class PostServiceImpl implements PostService{
     public Page<PostListPageResponseDTO> getPostList(Pageable pageable) {
         return postRepository.findAll(pageable)
                 .map(PostListPageResponseDTO::from);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostListPageResponseDTO> getMyPosts(Long userId, Pageable pageable) {
+        return postRepository.findByUser_UserId(userId, pageable)
+                .map(PostListPageResponseDTO::from);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostListPageResponseDTO> getLikedPosts(Long userId, Pageable pageable) {
+        return postLikeRepository.findByUser_UserIdAndIsLikedTrue(userId, pageable)
+                .map(postLike -> PostListPageResponseDTO.from(postLike.getPostId()));
     }
 
     @Override

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
 
 import java.util.List;
@@ -134,7 +133,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     @Transactional(readOnly = true)
-    public PostDetailResponseDTO getPostDetail(Long postId) {
+    public PostDetailResponseDTO getPostDetail(Long postId, Long userId) {
         // 게시글 조회
         Post post = postRepository.findById(postId).
                 orElseThrow(() -> new BusinessException(ExceptionCode.POST_NOT_FOUND));
@@ -145,7 +144,10 @@ public class PostServiceImpl implements PostService{
                 .map(ReplyResponseDTO::from)
                 .collect(Collectors.toList());
 
-        return PostDetailResponseDTO.from(post, replyResponseDTOS);
+        // 좋아요 유무 확인
+        boolean isLiked = postLikeRepository.existsByPostPostIdAndUserUserId(postId, userId);
+
+        return PostDetailResponseDTO.of(post, replyResponseDTOS, isLiked);
     }
 
     @Override

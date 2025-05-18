@@ -15,7 +15,7 @@ public interface PostService {
     void createPost(PostCreateRequestDTO dto, Long userId);
     void updatePost(Long postId, Long userId, PostUpdateRequestDTO dto, List<MultipartFile> files);
     void deletePost(Long postId, Long userId);
-    PostDetailResponseDTO getPostDetail(Long postId);
+    PostDetailResponseDTO getPostDetail(Long postId, Long userId);
     Page<PostListPageResponseDTO> getPostList(Pageable pageable);
     void increaseViewCount(Long postId, HttpSession session);
     Page<PostListPageResponseDTO> getMyPosts(Long userId, Pageable pageable);

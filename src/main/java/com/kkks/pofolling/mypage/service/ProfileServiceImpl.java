@@ -57,8 +57,11 @@ public class ProfileServiceImpl implements ProfileService {
                 .collect(Collectors.toList());
 
         return ProfileResponseDTO.builder()
+                .name(user.getName())
+                .email(user.getEmail())
                 .nickName(user.getNickname())
                 .profileImage(user.getProfileImage())
+                .phoneNumber(user.getPhoneNumber())
                 .jobType(user.getJobType())
                 .role(user.getRole())
                 .careers(careers)

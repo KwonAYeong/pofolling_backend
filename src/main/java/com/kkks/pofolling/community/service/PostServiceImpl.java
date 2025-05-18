@@ -39,7 +39,7 @@ public class PostServiceImpl implements PostService{
     private final S3Uploader s3Uploader;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, PostLikeRepository postLikeRepository, UserRepository userRepository, ReplyRepository repository, FileService fileService) {
+    public PostServiceImpl(PostRepository postRepository, PostLikeRepository postLikeRepository, UserRepository userRepository, ReplyRepository repository, S3Uploader s3Uploader) {
 
         this.postRepository = postRepository;
         this.postLikeRepository = postLikeRepository;
@@ -166,7 +166,7 @@ public class PostServiceImpl implements PostService{
     @Transactional(readOnly = true)
     public Page<PostListPageResponseDTO> getLikedPosts(Long userId, Pageable pageable) {
         return postLikeRepository.findByUser_UserIdAndIsLikedTrue(userId, pageable)
-                .map(postLike -> PostListPageResponseDTO.from(postLike.getPostId()));
+                .map(postLike -> PostListPageResponseDTO.from(postLike.getPost()));
     }
 
     @Override

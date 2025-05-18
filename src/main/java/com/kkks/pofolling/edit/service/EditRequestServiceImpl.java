@@ -65,6 +65,23 @@ public class EditRequestServiceImpl implements EditRequestService{
         editRequestRepository.save(editRequest); //editRequest 저장
     }
 
+    @Override
+    public void cancelRequestedPf(Long portfolioId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
+
+        EditRequest editRequest = editRequestRepository.findTopByPortfolioOrderByRequestedAtDesc(portfolio)
+                .orElseThrow(()-> new BusinessException(ExceptionCode.UNAUTHORIZED_EDIT_REQUEST));
+
+        // 상태값 변경
+        if (portfolio.getEditCount() > 0) {
+            portfolio.updateStatus(COMPLETED);
+        } else portfolio.updateStatus(REGISTERED);
+
+        // 등록된 첨삭포폴 삭제
+        editRequestRepository.delete(editRequest);
+    }
+
     private List<RegisteredPortfolioResponseDTO> getDtoList(List<Portfolio> portfolios) {
         return portfolios.stream()
                 .map(RegisteredPortfolioResponseDTO::from)

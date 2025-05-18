@@ -35,4 +35,12 @@ public class EditRequestController {
         return ResponseEntity.ok(ApiResponse.successWithMessage(204, "등록에 성공했습니다."));
     }
 
+    @PatchMapping("/{portfolioId}/cancel")
+    public ResponseEntity<ApiResponse<Void>> cancelRequestedEdit(
+        @PathVariable Long portfolioId
+    ){
+        editRequestService.cancelRequestedPf(portfolioId);
+        return ResponseEntity.ok(ApiResponse.successWithMessage(204, "요청된 첨삭이 취소되었습니다."));
+    }
+
 }

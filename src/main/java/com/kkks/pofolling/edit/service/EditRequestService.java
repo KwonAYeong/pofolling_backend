@@ -13,4 +13,6 @@ public interface EditRequestService {
     //이력 첨삭 상태값 변경 및 EditRequest 엔티티 생성.
     void requestEdit(Long portfolioId, Long menteeId);
 
+    void cancelRequestedPf(Long portfolioId);
+
 }

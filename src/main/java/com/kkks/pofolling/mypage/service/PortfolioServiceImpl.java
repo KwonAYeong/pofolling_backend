@@ -95,27 +95,6 @@ public class PortfolioServiceImpl implements PortfolioService {
                 .build();
     }
 
-    // 포트폴리오 상세 조회 (멘토용)
-    @Override
-    @Transactional(readOnly = true)
-    public PortfolioMentorDetailResponseDTO getMentorPortfolioDetail(Long editRequestId) {
-        EditRequest editRequest = editRequestRepository.findById(editRequestId)
-                .orElseThrow(() -> new BusinessException(ExceptionCode.EDIT_NOT_FOUND));
-
-        Portfolio portfolio = editRequest.getPortfolio();
-        User mentee = portfolio.getUser();
-
-        return PortfolioMentorDetailResponseDTO.builder()
-                .portfolioId(portfolio.getPortfolioId())
-                .title(portfolio.getTitle())
-                .content(portfolio.getContent())
-                .fileUrl(portfolio.getFileUrl())
-                .profileImage(mentee.getProfileImage())
-                .nickname(mentee.getNickname())
-                .requestedAt(editRequest.getRequestedAt())
-                .build();
-    }
-
     // 포트폴리오 수정
     @Override
     public void updatePortfolio(Long portfolioId, PortfolioUpdateDTO updateDTO) {

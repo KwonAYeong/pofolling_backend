@@ -18,4 +18,7 @@ public interface PostService {
     PostDetailResponseDTO getPostDetail(Long postId);
     Page<PostListPageResponseDTO> getPostList(Pageable pageable);
     void increaseViewCount(Long postId, HttpSession session);
+    Page<PostListPageResponseDTO> getMyPosts(Long userId, Pageable pageable);
+    Page<PostListPageResponseDTO> getLikedPosts(Long userId, Pageable pageable);
+
 }

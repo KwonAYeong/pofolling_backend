@@ -43,13 +43,6 @@ public class PortfolioController {
         return ResponseEntity.ok(portfolio);
     }
 
-    // 포트폴리오 상세 조회 (멘토용)
-    @GetMapping("/mentor/{editRequestId}")
-    public ResponseEntity<PortfolioMentorDetailResponseDTO> getMentorPortfolioDetail(@PathVariable Long editRequestId) {
-
-        return ResponseEntity.ok(portfolioService.getMentorPortfolioDetail(editRequestId));
-    }
-
     // 포트폴리오 수정
     @PatchMapping("/{portfolioId}")
     public ResponseEntity<String> updatePortfolio(@PathVariable Long portfolioId,

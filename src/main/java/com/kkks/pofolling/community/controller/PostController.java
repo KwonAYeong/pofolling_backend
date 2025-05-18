@@ -40,6 +40,28 @@ public class PostController {
         return ResponseEntity.ok(ComApiResponse.success(result));
     }
 
+    // 내가 쓴 글 목록 조회
+    @GetMapping("/myPosts/{userId}")
+    public ResponseEntity<ComApiResponse<Page<PostListPageResponseDTO>>> getMyPosts(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<PostListPageResponseDTO> result = postService.getMyPosts(userId, pageable);
+
+        return ResponseEntity.ok(ComApiResponse.success(result));
+    }
+
+    // 내가 좋아요 누른 글 목록 조회
+    @GetMapping("/likedPosts/{userId}")
+    public ResponseEntity<ComApiResponse<Page<PostListPageResponseDTO>>> getLikedPosts(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<PostListPageResponseDTO> result = postService.getLikedPosts(userId, pageable);
+
+        return ResponseEntity.ok(ComApiResponse.success(result));
+    }
+
     // 게시글 상세 정보 가져오기
     @GetMapping("/{postId}")
     public ResponseEntity<ComApiResponse<PostDetailResponseDTO>> getPostDetail(
@@ -84,6 +106,8 @@ public class PostController {
         postService.deletePost(postId, userId);
         return ResponseEntity.ok(ComApiResponse.successWithMessage(204, "게시글이 삭제되었습니다."));
     }
+
+
 
 }
 

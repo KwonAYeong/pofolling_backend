@@ -13,14 +13,14 @@ public class RegisteredPortfolioResponseDTO {
     private Long portfolioId;
     private PortfolioStatus status;
     private String title;
-    private LocalDateTime updatedAt;
+    private int requestCount;
 
     public static RegisteredPortfolioResponseDTO from(Portfolio portfolio) {
         return new RegisteredPortfolioResponseDTO(
                 portfolio.getPortfolioId(),
                 portfolio.getStatus(),
                 portfolio.getTitle(),
-                portfolio.getUpdatedAt()
+                portfolio.getEditCount()
         );
     }
 }

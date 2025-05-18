@@ -46,6 +46,10 @@ public class Portfolio {
     @Column(nullable = false)
     private PortfolioStatus status;
 
+    @Column(name = "edit_count")
+    @Builder.Default
+    private int editCount = 0;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -69,6 +73,11 @@ public class Portfolio {
     // 포트폴리오 삭제 (REGISTERED 인 상태에서만 삭제 가능)
     public boolean isDeletable() {
         return this.status == PortfolioStatus.REGISTERED;
+    }
+
+    // 첨삭 횟수 증가
+    public void increaseEditCount() {
+        this.editCount += 1;
     }
 
 }

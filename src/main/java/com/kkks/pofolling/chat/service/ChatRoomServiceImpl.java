@@ -152,6 +152,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<Portfolio> portfolios = portfolioRepository.findAllByChatRoom(chatRoom);
         portfolios.forEach(p -> p.updateStatus(PortfolioStatus.COMPLETED));
 
+        // 첨삭 횟수 추가
+        portfolios.forEach(Portfolio::increaseEditCount);
+
+
         // 최근 메시지 조회
         Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderBySentAtDesc(savedChatRoom);
         User sender = lastMessageOpt.map(ChatMessage::getSender).orElse(savedChatRoom.getMentee());

@@ -35,7 +35,7 @@ public class EditRequestServiceImpl implements EditRequestService{
     public List<RegisteredPortfolioResponseDTO> getRegisteredPf(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
-        List<Portfolio> portfolios = portfolioRepository.findByUserAndStatusIn(user, List.of(REGISTERED, COMPLETED));
+        List<Portfolio> portfolios = portfolioRepository.findByUserAndStatusIn(user, List.of(REGISTERED, COMPLETED, REQUESTED));
 
         return getDtoList(portfolios);
     }
@@ -63,6 +63,23 @@ public class EditRequestServiceImpl implements EditRequestService{
 
         EditRequest editRequest = EditRequest.create(portfolio, mentee); //editRequest 엔티티 생성
         editRequestRepository.save(editRequest); //editRequest 저장
+    }
+
+    @Override
+    public void cancelRequestedPf(Long portfolioId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
+
+        EditRequest editRequest = editRequestRepository.findTopByPortfolioOrderByRequestedAtDesc(portfolio)
+                .orElseThrow(()-> new BusinessException(ExceptionCode.UNAUTHORIZED_EDIT_REQUEST));
+
+        // 상태값 변경
+        if (portfolio.getEditCount() > 0) {
+            portfolio.updateStatus(COMPLETED);
+        } else portfolio.updateStatus(REGISTERED);
+
+        // 등록된 첨삭포폴 삭제
+        editRequestRepository.delete(editRequest);
     }
 
     private List<RegisteredPortfolioResponseDTO> getDtoList(List<Portfolio> portfolios) {

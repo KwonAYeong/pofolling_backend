@@ -74,9 +74,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Transactional
     public ChatRoom createChatRoomIfNotExists(Long mentorId, Long menteeId) {
         return chatRoomRepository
-                .findByMentor_UserIdAndMentee_UserIdAndIsActiveTrue(mentorId, menteeId)
+                .findByMentor_UserIdAndMentee_UserId(mentorId, menteeId)  // 모든 채팅방 조회 (isActive 제거)
                 .stream()
                 .findFirst()
+                .map(chatRoom -> {
+                    if (!chatRoom.isActive()) {  // 비활성화 상태면
+                        chatRoom.activate();    // 다시 활성화 (isActive = true)
+                        chatRoomRepository.save(chatRoom);
+                    }
+                    return chatRoom;
+                })
                 .orElseGet(() -> {
                     User mentor = userRepository.findById(mentorId)
                             .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
@@ -91,6 +98,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
                     return chatRoomRepository.save(newRoom);
                 });
+
     }
 
     // 채팅방 목록 조회
@@ -149,12 +157,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoom.deactivate();
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
-        List<Portfolio> portfolios = portfolioRepository.findAllByChatRoom(chatRoom);
-        portfolios.forEach(p -> p.updateStatus(PortfolioStatus.COMPLETED));
+        // (IN_PROGRESS 상태인 포트폴리오만 필터링
+        List<Portfolio> inProgressPortfolios = portfolioRepository.findAllByChatRoom(chatRoom).stream()
+                .filter(p -> p.getStatus() == PortfolioStatus.IN_PROGRESS)
+                .collect(Collectors.toList());
 
-        // 첨삭 횟수 추가
-        portfolios.forEach(Portfolio::increaseEditCount);
+        // 필터링된 포트폴리오만 상태 변경
+        inProgressPortfolios.forEach(p -> p.updateStatus(PortfolioStatus.COMPLETED));
 
+        // 필터링된 포트폴리오만 카운트 증가
+        inProgressPortfolios.forEach(Portfolio::increaseEditCount);
 
         // 최근 메시지 조회
         Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderBySentAtDesc(savedChatRoom);

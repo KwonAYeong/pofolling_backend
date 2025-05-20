@@ -16,7 +16,7 @@ public class EditDetailResponseDTO {
     private String title;
     private String content;
     private String fileUrl;
-    private LocalDateTime updatedAt;
+    private LocalDateTime requestedAt;
 
     // 멘티 정보
     private Long menteeId;
@@ -33,7 +33,7 @@ public class EditDetailResponseDTO {
                 portfolio.getTitle(),
                 portfolio.getContent(),
                 portfolio.getFileUrl(),
-                portfolio.getUpdatedAt(),
+                editRequest.getRequestedAt(),
                 mentee.getUserId(),
                 mentee.getProfileImage(),
                 mentee.getNickname()

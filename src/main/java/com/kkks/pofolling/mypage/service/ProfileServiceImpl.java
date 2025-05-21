@@ -146,7 +146,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional
     public String updateProfileImage(Long userId, MultipartFile file) throws IOException {
-        // 사용자 조회 (없으면 예외 발생)
+        // 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 

@@ -46,7 +46,7 @@ public class ProfileController {
         return ResponseEntity.ok(Map.of("isAvailable", isAvailable));
     }
 
-    // 프로필 이미지 파일을 S3에 업로드하고 사용자 정보에 URL 저장
+    // 프로필 이미지 파일을 S3에 업로드, 사용자 정보에 URL 저장
     @PatchMapping("/{userId}/image")
     public ResponseEntity<Map<String, String>> updateProfileImage(@PathVariable Long userId,
                                                                   @RequestPart("file") MultipartFile file) throws IOException {

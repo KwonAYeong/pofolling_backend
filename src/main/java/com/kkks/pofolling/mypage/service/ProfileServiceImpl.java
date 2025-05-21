@@ -150,7 +150,7 @@ public class ProfileServiceImpl implements ProfileService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
 
-        // 기존 이미지가 있다면 S3에서 삭제
+        // 기존 이미지 S3에서 삭제
         if (user.getProfileImage() != null) {
             s3Uploader.delete(user.getProfileImage());
         }

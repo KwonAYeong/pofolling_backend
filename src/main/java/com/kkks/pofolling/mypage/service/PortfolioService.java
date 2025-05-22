@@ -12,4 +12,5 @@ public interface PortfolioService {
     void deletePortfolio (Long portfolioId);
     List<PortfolioListResponseDTO> getMyPortfolios (Long userId, PortfolioStatus status);
     PortfolioMenteeDetailResponseDTO getMenteePortfolioDetail(Long portfolioId);
+    String getFileUrl(Long portfolioId);
 }

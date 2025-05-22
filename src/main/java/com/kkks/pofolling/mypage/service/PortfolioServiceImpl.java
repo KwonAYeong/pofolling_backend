@@ -8,6 +8,7 @@ import com.kkks.pofolling.mypage.dto.*;
 import com.kkks.pofolling.mypage.entity.Portfolio;
 import com.kkks.pofolling.mypage.entity.PortfolioStatus;
 import com.kkks.pofolling.mypage.repository.PortfolioRepository;
+import com.kkks.pofolling.s3.S3Uploader;
 import com.kkks.pofolling.user.entity.User;
 import com.kkks.pofolling.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class PortfolioServiceImpl implements PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final EditRequestRepository editRequestRepository;
+    private final S3Uploader s3Uploader;
 
 
     // 포트폴리오 등록
@@ -110,14 +112,22 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     // 포트폴리오 삭제
     @Override
+    @Transactional
     public void deletePortfolio(Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
 
-        if (!portfolio.isDeletable()) {
-            throw new BusinessException(ExceptionCode.PORTFOLIO_CANNOT_BE_DELETED);
-        }
+        s3Uploader.delete(portfolio.getFileUrl());
 
         portfolioRepository.delete(portfolio);
     }
+
+
+    @Override
+    public String getFileUrl(Long portfolioId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
+        return portfolio.getFileUrl();
+    }
+
 }

@@ -12,12 +12,14 @@ import com.kkks.pofolling.s3.S3Uploader;
 import com.kkks.pofolling.user.entity.User;
 import com.kkks.pofolling.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,6 +33,7 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     // 포트폴리오 등록
     @Override
+    @Transactional
     public Long createPortfolio(Long userId, PortfolioCreateDTO createDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
@@ -40,10 +43,12 @@ public class PortfolioServiceImpl implements PortfolioService {
                 .title(createDTO.getTitle())
                 .content(createDTO.getContent())
                 .fileUrl(createDTO.getFileUrl())
-                .status(com.kkks.pofolling.mypage.entity.PortfolioStatus.REGISTERED)
+                .status(PortfolioStatus.REGISTERED)
                 .build();
 
-        return portfolioRepository.save(portfolio).getPortfolioId();
+        Portfolio saved = portfolioRepository.save(portfolio);
+
+        return saved.getPortfolioId();
     }
 
     // 포트폴리오 목록 조회
@@ -99,16 +104,23 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     // 포트폴리오 수정
     @Override
-    public void updatePortfolio(Long portfolioId, PortfolioUpdateDTO updateDTO) {
+    @Transactional
+    public void updatePortfolio(Long portfolioId, PortfolioUpdateDTO dto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
 
-        if (portfolio.getStatus() == PortfolioStatus.REQUESTED || portfolio.getStatus() == PortfolioStatus.IN_PROGRESS) {
-            throw new BusinessException(ExceptionCode.PORTFOLIO_CANNOT_BE_MODIFIED);
+        if (portfolio.getStatus() != PortfolioStatus.REGISTERED) {
+            throw new BusinessException(ExceptionCode.INVALID_PORTFOLIO_STATUS);
         }
 
-        portfolio.update(updateDTO.getTitle(), updateDTO.getContent(), updateDTO.getFileUrl());
+        portfolio.setTitle(dto.getTitle());
+        portfolio.setContent(dto.getContent());
+
+        if (dto.getFileUrl() != null) {
+            portfolio.setFileUrl(dto.getFileUrl());
+        }
     }
+
 
     // 포트폴리오 삭제
     @Override

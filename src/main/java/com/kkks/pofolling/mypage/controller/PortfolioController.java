@@ -33,6 +33,8 @@ public class PortfolioController {
         String fileUrl = s3Uploader.upload(file, "portfolio");
         createDTO.setFileUrl(fileUrl);
 
+        Long portfolioId = portfolioService.createPortfolio(userId, createDTO);
+
         return ResponseEntity.ok("포트폴리오 등록 완료");
     }
 
@@ -58,8 +60,12 @@ public class PortfolioController {
     public ResponseEntity<String> updatePortfolio(
             @PathVariable Long portfolioId,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestPart("data") PortfolioUpdateDTO updateDTO) throws IOException {
+            @RequestPart("data") String dataJson) throws IOException {
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        PortfolioUpdateDTO updateDTO = objectMapper.readValue(dataJson, PortfolioUpdateDTO.class);
+
+        // 파일이 새로 들어오면 기존 파일 삭제 후 새 파일 업로드
         if (file != null) {
             String oldUrl = portfolioService.getFileUrl(portfolioId);
             s3Uploader.delete(oldUrl);

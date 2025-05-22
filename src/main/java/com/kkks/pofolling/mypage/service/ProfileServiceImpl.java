@@ -10,12 +10,15 @@ import com.kkks.pofolling.mypage.entity.Career;
 import com.kkks.pofolling.mypage.entity.Education;
 import com.kkks.pofolling.mypage.repository.CareerRepository;
 import com.kkks.pofolling.mypage.repository.EducationRepository;
+import com.kkks.pofolling.s3.S3Uploader;
 import com.kkks.pofolling.user.entity.User;
 import com.kkks.pofolling.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final UserRepository userRepository;
     private final CareerRepository careerRepository;
     private final EducationRepository educationRepository;
+    private final S3Uploader s3Uploader;
 
     // 마이페이지 - 프로필 조회
     @Override
@@ -136,6 +140,29 @@ public class ProfileServiceImpl implements ProfileService {
                     .collect(Collectors.toList());
             educationRepository.saveAll(educations);
         }
+    }
+
+    // 프로필 이미지 S3에 업로드, 기존 이미지는 삭제 후 새 URL 저장
+    @Override
+    @Transactional
+    public String updateProfileImage(Long userId, MultipartFile file) throws IOException {
+        // 사용자 조회 (없으면 예외 발생)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.USER_NOT_FOUND));
+
+        // 기존 이미지가 있다면 S3에서 삭제
+        if (user.getProfileImage() != null) {
+            s3Uploader.delete(user.getProfileImage());
+        }
+
+        // 새 이미지 S3에 업로드 → 업로드된 이미지 URL 반환
+        String imageUrl = s3Uploader.upload(file, "profile");
+
+        // 사용자 엔터티에 이미지 URL 저장
+        user.setProfileImage(imageUrl);
+
+        // 업로드된 이미지 URL 응답으로 반환
+        return imageUrl;
     }
 
     // 닉네임 중복 확인

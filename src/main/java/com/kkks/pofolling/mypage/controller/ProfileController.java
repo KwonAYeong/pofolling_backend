@@ -9,7 +9,9 @@ import com.kkks.pofolling.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -31,7 +33,7 @@ public class ProfileController {
     // 마이페이지 - 프로필 수정
     @PatchMapping("/{userId}")
     public ResponseEntity<String> updateProfile(@PathVariable Long userId,
-                                              @RequestBody ProfileUpdateDTO updateDTO) {
+                                                @RequestBody ProfileUpdateDTO updateDTO) {
         mypageProfileService.updateProfile(userId, updateDTO);
         return ResponseEntity.ok("회원정보가 수정되었습니다.");
     }
@@ -42,6 +44,15 @@ public class ProfileController {
         boolean isAvailable = profileService.isNicknameAvailable(userId, nickname);
 
         return ResponseEntity.ok(Map.of("isAvailable", isAvailable));
+    }
+
+    // 프로필 이미지 파일을 S3에 업로드하고 사용자 정보에 URL 저장
+    @PatchMapping("/{userId}/image")
+    public ResponseEntity<Map<String, String>> updateProfileImage(@PathVariable Long userId,
+                                                                  @RequestPart("file") MultipartFile file) throws IOException {
+        String imageUrl = mypageProfileService.updateProfileImage(userId, file);
+
+        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
     }
 
 

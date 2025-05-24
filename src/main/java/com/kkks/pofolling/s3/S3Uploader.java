@@ -21,18 +21,21 @@ public class S3Uploader {
 
     // 파일 업로드 로직
     public String upload(MultipartFile file, String dirName) throws IOException {
-        String fileName = dirName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String originalFileName = file.getOriginalFilename();
+        String fileName = dirName + "/" + UUID.randomUUID() + "_" + originalFileName;
 
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileName)
                 .contentType(file.getContentType())
+                .contentDisposition("attachment; filename=\"" + originalFileName + "\"")
                 .build();
 
         s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
 
         return "https://" + bucket + ".s3.amazonaws.com/" + fileName;
     }
+
 
     // 파일 삭제 로직
     public void delete(String fileUrl) {

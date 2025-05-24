@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Component
@@ -22,19 +24,22 @@ public class S3Uploader {
     // 파일 업로드 로직
     public String upload(MultipartFile file, String dirName) throws IOException {
         String originalFileName = file.getOriginalFilename();
-        String fileName = dirName + "/" + UUID.randomUUID() + "_" + originalFileName;
+        String safeFileName = UUID.randomUUID() + "_" + originalFileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+        String fileName = dirName + "/" + safeFileName;
 
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileName)
                 .contentType(file.getContentType())
-                .contentDisposition("attachment; filename=\"" + originalFileName + "\"")
+                .contentDisposition("attachment; filename*=UTF-8''" + URLEncoder.encode(originalFileName, StandardCharsets.UTF_8))
                 .build();
 
         s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
 
         return "https://" + bucket + ".s3.amazonaws.com/" + fileName;
     }
+
+
 
 
     // 파일 삭제 로직

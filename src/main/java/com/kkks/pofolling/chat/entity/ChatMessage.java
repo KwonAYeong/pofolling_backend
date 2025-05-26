@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +32,9 @@ public class ChatMessage {
 
     @Column(name = "message", nullable = false)
     private String message;
+
+    @Column(name = "file_url")
+    private String fileUrl;
 
     @CreatedDate
     @Column(name = "sent_at", updatable = false)

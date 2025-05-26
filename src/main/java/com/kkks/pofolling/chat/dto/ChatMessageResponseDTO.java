@@ -15,5 +15,6 @@ public class ChatMessageResponseDTO {
     private String senderNickname;
     private String senderProfileImage;
     private String message;
+    private String fileUrl;
     private LocalDateTime sentAt;
 }

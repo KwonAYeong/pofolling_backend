@@ -9,4 +9,5 @@ public class ChatMessageRequestDTO {
 
     private Long senderId;
     private String message;
+    private String fileUrl;
 }

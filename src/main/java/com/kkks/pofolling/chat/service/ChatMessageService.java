@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ChatMessageService {
 
-    ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message);
+    ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message, String fileUrl);
     List<ChatMessageResponseDTO> findAllMessagesByChatRoomId(Long chatRoomId);
 
 }

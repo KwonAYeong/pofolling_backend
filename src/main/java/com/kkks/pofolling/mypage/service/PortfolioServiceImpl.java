@@ -109,7 +109,8 @@ public class PortfolioServiceImpl implements PortfolioService {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.PORTFOLIO_NOT_FOUND));
 
-        if (portfolio.getStatus() != PortfolioStatus.REGISTERED) {
+        if (portfolio.getStatus() != PortfolioStatus.REGISTERED &&
+            portfolio.getStatus() != PortfolioStatus.COMPLETED) {
             throw new BusinessException(ExceptionCode.INVALID_PORTFOLIO_STATUS);
         }
 

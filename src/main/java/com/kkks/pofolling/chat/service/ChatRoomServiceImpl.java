@@ -126,13 +126,20 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                             ? room.getMentee()
                             : room.getMentor();
 
+                    List<Portfolio> portfolios = portfolioRepository.findAllByChatRoom(room);
+
                     List<Long> portfolioIds = portfolioRepository.findAllByChatRoom(room).stream()
                             .map(Portfolio::getPortfolioId)
+                            .collect(Collectors.toList());
+
+                    List<String> portfolioTitles = portfolios.stream()
+                            .map(Portfolio::getTitle)
                             .collect(Collectors.toList());
 
                     return ChatRoomResponseDTO.builder()
                             .chatRoomId(room.getChatRoomId())
                             .portfolioIds(portfolioIds)
+                            .portfolioTitles(portfolioTitles)
                             .mentorId(room.getMentor().getUserId())
                             .menteeId(room.getMentee().getUserId())
                             .senderId(opponent.getUserId())
@@ -173,34 +180,49 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User sender = lastMessageOpt.map(ChatMessage::getSender).orElse(savedChatRoom.getMentee());
         String lastMessageText = lastMessageOpt.map(ChatMessage::getMessage).orElse(null);
 
+        List<Portfolio> portfolios = savedChatRoom.getPortfolios();
+
+        List<Long> portfolioIds = portfolios.stream()
+                .map(Portfolio::getPortfolioId)
+                .collect(Collectors.toList());
+
+        List<String> portfolioTitles = portfolios.stream()
+                .map(Portfolio::getTitle)
+                .collect(Collectors.toList());
+
         // 최신 상태 반환
-        return new ChatRoomResponseDTO(
-                savedChatRoom.getChatRoomId(),
-                savedChatRoom.getPortfolios().stream()
-                        .map(Portfolio::getPortfolioId)
-                        .collect(Collectors.toList()),
-                savedChatRoom.getMentor().getUserId(),
-                savedChatRoom.getMentee().getUserId(),
-                sender.getUserId(),
-                sender.getNickname(),
-                sender.getProfileImage(),
-                lastMessageText,
-                false,
-                savedChatRoom.isActive(),
-                savedChatRoom.getCreatedAt(),
-                savedChatRoom.getUpdatedAt()
-        );
+        return ChatRoomResponseDTO.builder()
+                .chatRoomId(savedChatRoom.getChatRoomId())
+                .portfolioIds(portfolioIds)
+                .portfolioTitles(portfolioTitles)
+                .mentorId(savedChatRoom.getMentor().getUserId())
+                .menteeId(savedChatRoom.getMentee().getUserId())
+                .senderId(sender.getUserId())
+                .senderNickname(sender.getNickname())
+                .senderProfileImage(sender.getProfileImage())
+                .lastMessage(lastMessageText)
+                .hasNewMessage(false)
+                .isActive(savedChatRoom.isActive())
+                .createdAt(savedChatRoom.getCreatedAt())
+                .updatedAt(savedChatRoom.getUpdatedAt())
+                .build();
     }
 
     // 공통 DTO 변환
     private ChatRoomResponseDTO convertToDTO(ChatRoom room) {
-        List<Long> portfolioIds = portfolioRepository.findAllByChatRoom(room).stream()
+        List<Portfolio> portfolios = portfolioRepository.findAllByChatRoom(room);
+
+        List<Long> portfolioIds = portfolios.stream()
                 .map(Portfolio::getPortfolioId)
+                .collect(Collectors.toList());
+        List<String> portfolioTitles = portfolios.stream()
+                .map(Portfolio::getTitle)
                 .collect(Collectors.toList());
 
         return ChatRoomResponseDTO.builder()
                 .chatRoomId(room.getChatRoomId())
                 .portfolioIds(portfolioIds)
+                .portfolioTitles(portfolioTitles)
                 .mentorId(room.getMentor().getUserId())
                 .menteeId(room.getMentee().getUserId())
                 .createdAt(room.getCreatedAt())

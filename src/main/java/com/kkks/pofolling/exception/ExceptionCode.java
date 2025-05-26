@@ -27,6 +27,8 @@ public enum ExceptionCode {
     UNAUTHORIZED_POST(403, "UNAUTHORIZED_POST", "해당 게시글의 소유자가 아닙니다"),
     UNAUTHORIZED_REPLY(403, "UNAUTHORIZED_REPLY", "해당 댓글의 소유자가 아닙니다"),
     REPLY_NOT_FOUND(400, "REPLY_NOT_FOUND", "해당 댓글이 존재하지 않습니다."),
+    FILE_SLOT_FULL(400,"FILE_SLOT_FULL","파일 첨부 가능 개수를 초과하셨습니다."),
+
     // chat
     CHATROOM_NOT_FOUND(404, "CHATROOM_NOT_FOUND", "해당 채팅방이 존재하지 않습니다."),
     CHATROOM_CLOSED(403, "CHATROOM_CLOSED", "첨삭이 종료된 채팅방입니다."),

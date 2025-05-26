@@ -27,7 +27,8 @@ public class ChatWebSocketController {
         ChatMessageResponseDTO saved = chatMessageService.saveNewChatMessage(
                 socketMessageDTO.getChatRoomId(),
                 socketMessageDTO.getSenderId(),
-                socketMessageDTO.getMessage());
+                socketMessageDTO.getMessage(),
+                socketMessageDTO.getFileUrl());
 
         // 해당 채팅방을 구독 중인 모든 클라이언트에게 메세지 전송
         messagingTemplate.convertAndSend(

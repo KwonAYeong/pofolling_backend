@@ -31,7 +31,8 @@ public class ChatMessageController {
         ChatMessageResponseDTO response = chatMessageService.saveNewChatMessage(
                 chatRoomId,
                 requestDTO.getSenderId(),
-                requestDTO.getMessage());
+                requestDTO.getMessage(),
+                requestDTO.getFileUrl());
 
         return ResponseEntity.ok(response);
     }

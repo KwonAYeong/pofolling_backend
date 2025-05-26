@@ -27,7 +27,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     // 채팅 메세지 저장
     @Override
     @Transactional
-    public ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message) {
+    public ChatMessageResponseDTO saveNewChatMessage(Long chatRoomId, Long senderId, String message, String fileUrl) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new BusinessException(ExceptionCode.CHATROOM_NOT_FOUND));
 
@@ -42,6 +42,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .chatRoom(chatRoom)
                 .sender(sender)
                 .message(message)
+                .fileUrl(fileUrl)
                 .sentAt(LocalDateTime.now())
                 .build());
 
@@ -52,6 +53,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .senderNickname(sender.getNickname())
                 .senderProfileImage(sender.getProfileImage())
                 .message(saved.getMessage())
+                .fileUrl(saved.getFileUrl())
                 .sentAt(saved.getSentAt())
                 .build();
     }
@@ -70,6 +72,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                         .senderNickname(msg.getSender().getNickname())
                         .senderProfileImage(msg.getSender().getProfileImage())
                         .message(msg.getMessage())
+                        .fileUrl(msg.getFileUrl())
                         .sentAt(msg.getSentAt())
                         .build()
         ).toList();

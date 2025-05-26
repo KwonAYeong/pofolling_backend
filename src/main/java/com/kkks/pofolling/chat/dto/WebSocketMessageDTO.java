@@ -9,4 +9,5 @@ public class WebSocketMessageDTO {
     private Long chatRoomId;
     private Long senderId;
     private String message;
+    private String fileUrl;
 }

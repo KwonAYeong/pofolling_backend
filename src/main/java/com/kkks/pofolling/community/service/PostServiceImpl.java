@@ -60,6 +60,7 @@ public class PostServiceImpl implements PostService{
                 .user(user)
                 .build();
 
+        // 파일 업로드
         List<MultipartFile> files = dto.getFiles();
         if (files != null && !files.isEmpty()) {
             for (int i = 0; i < Math.min(3, files.size()); i++) {
@@ -75,7 +76,6 @@ public class PostServiceImpl implements PostService{
                 } catch (IOException e) {
                     throw new BusinessException(ExceptionCode.FILE_UPLOAD_FAILED);
                 }
-
             }
         }
 
@@ -103,8 +103,7 @@ public class PostServiceImpl implements PostService{
         deleteSelectedPostFiles(dto, post);
 
         // 파일 재등록 로직
-        replacePostFiles(dto, files, post);
-
+        addNewPostFiles(files, post);
 
         log.info("success for updatePost");
     }
@@ -206,51 +205,32 @@ public class PostServiceImpl implements PostService{
         }
     }
 
-    private void replacePostFiles(PostUpdateRequestDTO dto, List<MultipartFile> files, Post post) {
-        if (files != null && dto.getUpdatedFilePositions() != null) {
-            for (MultipartFile file : files) {
-                String originalName = file.getOriginalFilename();
+    private void addNewPostFiles(List<MultipartFile> files, Post post) {
+        if (files == null || files.isEmpty()) return;
 
-                for (Map.Entry<String, String> entry : dto.getUpdatedFilePositions().entrySet()) {
-                    String position = entry.getKey(); // ex: fileUrl1
-                    String expectedFilename = entry.getValue(); // ex: image1.jpg
+        for (MultipartFile file : files) {
+            // 업로드
+            String uploadedUrl;
+            try {
+                uploadedUrl = s3Uploader.upload(file, "community");
+            } catch (IOException e) {
+                throw new BusinessException(ExceptionCode.FILE_UPLOAD_FAILED);
+            }
 
-                    if (expectedFilename.equals(originalName)) {
-                        // 기존 파일 삭제
-                        String oldUrl = switch (position) {
-                            case "fileUrl1" -> post.getFileUrl1();
-                            case "fileUrl2" -> post.getFileUrl2();
-                            case "fileUrl3" -> post.getFileUrl3();
-                            default -> null;
-                        };
-
-                        if (oldUrl != null) {
-                            try {
-                                s3Uploader.delete(oldUrl);
-                            } catch (Exception e) {
-                                throw new BusinessException(ExceptionCode.FILE_DELETE_FAILED);
-                            }
-                        }
-
-                        // 새 파일 업로드
-                        String uploadedUrl;
-                        try {
-                            uploadedUrl = s3Uploader.upload(file, "community");
-                        } catch (IOException e) {
-                            throw new BusinessException(ExceptionCode.FILE_UPLOAD_FAILED);
-                        }
-
-                        // 업로드된 URL을 포지션에 맞게 반영
-                        switch (position) {
-                            case "fileUrl1" -> post.setFileUrl1(uploadedUrl);
-                            case "fileUrl2" -> post.setFileUrl2(uploadedUrl);
-                            case "fileUrl3" -> post.setFileUrl3(uploadedUrl);
-                        }
-                    }
-                }
+            // 비어 있는 fileUrl 슬롯에 넣기
+            if (post.getFileUrl1() == null) {
+                post.setFileUrl1(uploadedUrl);
+            } else if (post.getFileUrl2() == null) {
+                post.setFileUrl2(uploadedUrl);
+            } else if (post.getFileUrl3() == null) {
+                post.setFileUrl3(uploadedUrl);
+            } else {
+                // 슬롯이 꽉 찼으면 예외 발생
+                throw new BusinessException(ExceptionCode.FILE_SLOT_FULL);
             }
         }
     }
+
 
     private void deleteSelectedPostFiles(PostUpdateRequestDTO dto, Post post) {
         if (dto.getDeleteFileUrls() != null) {

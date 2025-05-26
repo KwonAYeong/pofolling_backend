@@ -15,7 +15,4 @@ public class PostUpdateRequestDTO {
 
     // 삭제할 파일의 S3 URL 목록
     private List<String> deleteFileUrls;
-
-    // 업데이트할 파일의 포지션 (예: fileUrl1) → 파일명 (예: image1.jpg)
-    private Map<String, String> updatedFilePositions;
 }

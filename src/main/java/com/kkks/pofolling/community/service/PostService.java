@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface PostService {
     void createPost(PostCreateRequestDTO dto, Long userId);
-    void updatePost(Long postId, Long userId, PostUpdateRequestDTO dto, List<MultipartFile> files);
+    void updatePost(PostUpdateRequestDTO dto, Long postId, Long userId);
     void deletePost(Long postId, Long userId);
     PostDetailResponseDTO getPostDetail(Long postId, Long userId);
     Page<PostListPageResponseDTO> getPostList(Pageable pageable);

@@ -39,9 +39,6 @@ public class S3Uploader {
         return "https://" + bucket + ".s3.amazonaws.com/" + fileName;
     }
 
-
-
-
     // 파일 삭제 로직
     public void delete(String fileUrl) {
         String fileKey = extractFileKey(fileUrl);

@@ -23,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/community/post")
 public class PostController {
+
     private final PostService postService;
 
     @Autowired
@@ -88,15 +89,14 @@ public class PostController {
     }
 
     // 게시글 수정 요청
-    @PatchMapping(value = "/{postId}/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping("/{postId}/{userId}")
     public ResponseEntity<ComApiResponse<Void>> updatePost(
+            @ModelAttribute PostUpdateRequestDTO dto,
             @PathVariable Long postId,
-            @PathVariable Long userId,
-            @RequestPart("data") PostUpdateRequestDTO dto,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files
+            @PathVariable Long userId
     ) {
-        postService.updatePost(postId, userId, dto, files);
-        return ResponseEntity.ok(ComApiResponse.successWithMessage(204, "게시글이 수정되었습니다."));
+        postService.updatePost(dto, postId, userId);
+        return ResponseEntity.ok(ComApiResponse.successWithMessage(200, "게시글이 수정되었습니다."));
     }
 
     // 게시글 삭제 요청

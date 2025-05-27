@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 @Transactional()
 @Slf4j
 public class PostServiceImpl implements PostService{
+
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
@@ -86,29 +87,64 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public void updatePost(Long postId, Long userId, PostUpdateRequestDTO dto, List<MultipartFile> files) {
+    public void updatePost(PostUpdateRequestDTO dto, Long postId, Long userId) {
         // 게시글 조회
-        Post post = postRepository.findById(postId).
-                orElseThrow(() -> new BusinessException(ExceptionCode.POST_NOT_FOUND));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ExceptionCode.POST_NOT_FOUND));
 
-        // 작성자 확인
+        // 작성자 권한 확인
         if (!post.getUser().getUserId().equals(userId)) {
             throw new BusinessException(ExceptionCode.UNAUTHORIZED_POST);
         }
 
-        // 게시글 업데이트
+        // 제목, 내용 수정
         post.update(dto.getTitle(), dto.getContent());
 
-        // 선택된 파일 삭제 로직
-        deleteSelectedPostFiles(dto, post);
+        // 삭제할 파일 처리
+        if (dto.getDeleteFileUrls() != null) {
+            for (String fileUrl : dto.getDeleteFileUrls()) {
+                // S3에서 파일 삭제
+                s3Uploader.delete(fileUrl);
 
-        // 파일 재등록 로직
-        addNewPostFiles(files, post);
+                // post 엔티티에서 file_url_1~3 중 일치하는 필드 null 처리
+                if (fileUrl.equals(post.getFileUrl1())) {
+                    post.setFileUrl1(null);
+                } else if (fileUrl.equals(post.getFileUrl2())) {
+                    post.setFileUrl2(null);
+                } else if (fileUrl.equals(post.getFileUrl3())) {
+                    post.setFileUrl3(null);
+                }
+            }
+        }
 
-        log.info("success for updatePost");
+        // 새로 업로드한 파일들 추가 (비어있는 file_url_x에 순서대로 저장)
+        if (dto.getFiles() != null) {
+            for (MultipartFile file : dto.getFiles()) {
+                if (file.isEmpty()) continue;
+
+                try {
+                    String uploadedUrl = s3Uploader.upload(file, "community");
+
+                    if (post.getFileUrl1() == null) {
+                        post.setFileUrl1(uploadedUrl);
+                    } else if (post.getFileUrl2() == null) {
+                        post.setFileUrl2(uploadedUrl);
+                    } else if (post.getFileUrl3() == null) {
+                        post.setFileUrl3(uploadedUrl);
+                    } else {
+                        throw new BusinessException(ExceptionCode.FILE_SLOT_FULL);
+                    }
+
+                } catch (IOException e) {
+                    throw new BusinessException(ExceptionCode.FILE_UPLOAD_FAILED);
+
+                }
+            }
+        }
+
+        // DB에 저장
+        postRepository.save(post);
     }
-
-
 
 
     @Override
